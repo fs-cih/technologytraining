@@ -51,6 +51,17 @@
   .video-wrap #player2{width:100%;height:100%;border:0;}
   .video-16x9{aspect-ratio:16/9;}
   .muted{color:var(--muted)}
+  .audio-player{display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:18px;border:1px solid var(--border);border-radius:12px;background:#f9fafb;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);}
+  .audio-toggle{width:42px;height:42px;border-radius:50%;border:0;background:var(--primary);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s background,.2s transform;}
+  .audio-toggle:hover{background:var(--primary-700);transform:scale(1.02);}
+  .audio-toggle:focus-visible{outline:3px solid rgba(37,99,235,0.35);outline-offset:2px;}
+  .audio-progress-wrap{flex:1;display:flex;flex-direction:column;gap:6px;}
+  .audio-progress{width:100%;accent-color:var(--primary);}
+  .audio-time{font-size:13px;color:#4b5563;}
+  @media (max-width:520px){
+    .audio-player{flex-direction:column;align-items:stretch;}
+    .audio-toggle{margin:0 auto;}
+  }
   fieldset{border:0;padding:0;margin:12px 0}
   .q{margin:10px 0 14px 0;padding-bottom:6px;border-bottom:1px dashed var(--border)}
   .q p{margin:0 0 6px 0}
@@ -101,6 +112,16 @@
         </div>
         <div class="hr"></div>
         <div class="content-read" id="read1">
+          <div class="audio-player" data-segment="1">
+            <button type="button" class="audio-toggle" aria-label="Play audio narration for Passwords and Multi-Factor Authentication" data-play-label="Play audio narration for Passwords and Multi-Factor Authentication" data-pause-label="Pause audio narration for Passwords and Multi-Factor Authentication">
+              <span class="audio-icon" aria-hidden="true">▶</span>
+            </button>
+            <div class="audio-progress-wrap">
+              <input type="range" class="audio-progress" value="0" min="0" max="100" step="0.1" aria-label="Audio playback progress">
+              <span class="audio-time" aria-live="polite">0:00 / 0:00</span>
+            </div>
+            <audio preload="metadata" src="Passwords+and+MFA.mp3"></audio>
+          </div>
           <article>
             <h3>Passwords &amp; Multi-Factor Authentication</h3>
             <div class="hr"></div>
@@ -588,6 +609,103 @@
         byId('genCertBtn').disabled = false;
       }
     }
+    // Audio player controls
+    const audioPlayers = Array.from(document.querySelectorAll('.audio-player'));
+    let activeAudio = null;
+
+    function formatTime(seconds){
+      if(!Number.isFinite(seconds) || seconds <= 0){
+        return '0:00';
+      }
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60).toString().padStart(2,'0');
+      return `${mins}:${secs}`;
+    }
+
+    audioPlayers.forEach(player=>{
+      const audio = player.querySelector('audio');
+      const toggle = player.querySelector('.audio-toggle');
+      const progress = player.querySelector('.audio-progress');
+      const timeLabel = player.querySelector('.audio-time');
+      const icon = toggle.querySelector('.audio-icon');
+      const playLabel = toggle.dataset.playLabel || 'Play audio narration';
+      const pauseLabel = toggle.dataset.pauseLabel || 'Pause audio narration';
+
+      let isScrubbing = false;
+
+      function updateTime(){
+        const duration = audio.duration || 0;
+        const current = audio.currentTime || 0;
+        const percent = duration ? (current / duration) * 100 : 0;
+        if(!isScrubbing){
+          progress.value = percent;
+        }
+        const totalText = duration ? formatTime(duration) : '0:00';
+        timeLabel.textContent = `${formatTime(current)} / ${totalText}`;
+      }
+
+      function setToggleState(isPlaying){
+        if(isPlaying){
+          icon.textContent = '⏸';
+          toggle.setAttribute('aria-label', pauseLabel);
+        } else {
+          icon.textContent = '▶';
+          toggle.setAttribute('aria-label', playLabel);
+        }
+      }
+
+      toggle.addEventListener('click', ()=>{
+        if(audio.paused){
+          if(activeAudio && activeAudio !== audio){
+            activeAudio.pause();
+          }
+          audio.play();
+          activeAudio = audio;
+        } else {
+          audio.pause();
+        }
+      });
+
+      const stopScrub = ()=>{ isScrubbing = false; };
+      ['mousedown','touchstart','pointerdown'].forEach(evt=>{
+        progress.addEventListener(evt, ()=>{ isScrubbing = true; });
+      });
+      ['mouseup','mouseleave','touchend','touchcancel','pointerup','blur'].forEach(evt=>{
+        progress.addEventListener(evt, stopScrub);
+      });
+
+      progress.addEventListener('input', ()=>{
+        const duration = audio.duration;
+        if(Number.isFinite(duration) && duration > 0){
+          const newTime = (progress.value / 100) * duration;
+          audio.currentTime = newTime;
+          updateTime();
+        }
+      });
+
+      audio.addEventListener('loadedmetadata', updateTime);
+      audio.addEventListener('timeupdate', updateTime);
+      audio.addEventListener('play', ()=> setToggleState(true));
+      audio.addEventListener('pause', ()=>{
+        setToggleState(false);
+        if(activeAudio === audio && audio.paused){
+          activeAudio = null;
+        }
+      });
+      audio.addEventListener('ended', ()=>{
+        audio.currentTime = 0;
+        progress.value = 0;
+        updateTime();
+        setToggleState(false);
+      });
+
+      if(audio.readyState >= 1){
+        updateTime();
+      } else {
+        audio.addEventListener('loadeddata', updateTime, { once:true });
+      }
+    });
+
     function setMode(n, mode){
       state.mode[n] = mode;
       const note = byId('modeNote'+n);
@@ -727,6 +845,12 @@
       // If segment had a player and was at end, seek to 0
       if(n===2 && player2 && typeof player2.seekTo === 'function'){
         try { player2.seekTo(0,true); player2.pauseVideo && player2.pauseVideo(); } catch(e){}
+      }
+      const audioEl = document.querySelector(`#seg${n} .audio-player audio`);
+      if(audioEl){
+        audioEl.pause();
+        audioEl.currentTime = 0;
+        audioEl.dispatchEvent(new Event('timeupdate'));
       }
       updateTOC();
     }
