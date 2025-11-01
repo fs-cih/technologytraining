@@ -400,6 +400,41 @@
 
     // --- Helpers ---
     const byId = (id)=>document.getElementById(id);
+
+    // Ensure jsPDF is available before trying to create a certificate.
+    let ensureJsPdfPromise = null;
+    function resolveJsPdfCtor(){
+      return window.jspdf?.jsPDF || window.jsPDF || null;
+    }
+    function loadJsPdfScript(){
+      return new Promise((resolve, reject)=>{
+        const existing = document.querySelector('script[data-autoload="jspdf"]');
+        if(existing){
+          existing.addEventListener('load', ()=> resolve(resolveJsPdfCtor()));
+          existing.addEventListener('error', ()=> reject(new Error('Failed to load jsPDF.')));
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        script.crossOrigin = 'anonymous';
+        script.referrerPolicy = 'no-referrer';
+        script.dataset.autoload = 'jspdf';
+        script.onload = ()=> resolve(resolveJsPdfCtor());
+        script.onerror = ()=> reject(new Error('Failed to load jsPDF.'));
+        document.head.appendChild(script);
+      });
+    }
+    async function ensureJsPdf(){
+      const ctor = resolveJsPdfCtor();
+      if(ctor) return ctor;
+      if(!ensureJsPdfPromise){
+        ensureJsPdfPromise = loadJsPdfScript().catch(err=>{
+          ensureJsPdfPromise = null;
+          throw err;
+        });
+      }
+      return ensureJsPdfPromise;
+    }
     function lockSeg(n, locked){
       const el = byId('seg'+n);
       state.locked[n] = !!locked;
@@ -601,8 +636,23 @@
         return;
       }
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit:'pt', format:'letter' });
+      let jsPdfCtor;
+      try {
+        jsPdfCtor = await ensureJsPdf();
+      } catch(err){
+        console.error(err);
+        byId('certStatus').textContent = 'Unable to load PDF generator. Please check your connection and try again.';
+        byId('certStatus').className = 'status err';
+        return;
+      }
+
+      if(!jsPdfCtor){
+        byId('certStatus').textContent = 'PDF generator unavailable in this browser.';
+        byId('certStatus').className = 'status err';
+        return;
+      }
+
+      const doc = new jsPdfCtor({ unit:'pt', format:'letter' });
 
       // Header
       doc.setFont('helvetica','bold');
