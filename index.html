@@ -32,8 +32,7 @@
   }
   .btn:hover{background:var(--primary-700)}
   .btn:disabled{opacity:.55;cursor:not-allowed}
-  .row{display:grid;grid-template-columns:1fr;gap:18px;margin-top:18px}
-  @media(min-width:860px){ .row{grid-template-columns:1fr 1fr} }
+  .row{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px}
   .card{
     background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;
     box-shadow:0 2px 10px rgba(0,0,0,.04);position:relative;overflow:hidden;
@@ -47,7 +46,9 @@
   .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
     padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:#374151;background:#f9fafb}
   .section-controls{display:flex;align-items:center;gap:12px;margin:10px 0 12px 0}
-  .video-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000}
+  .video-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000;width:100%;}
+  .video-wrap iframe,
+  .video-wrap #player2{width:100%;height:100%;border:0;}
   .video-16x9{aspect-ratio:16/9;}
   .muted{color:var(--muted)}
   fieldset{border:0;padding:0;margin:12px 0}
@@ -73,7 +74,6 @@
     <div class="intro">
       <h1>Cybersecurity Awareness Training</h1>
       <p class="lead">This short course has four segments. Choose to <strong>read</strong> or <strong>watch</strong> in each segment, then pass a 5-question quiz (score 4/5) to unlock the next segment. After all four are complete, enter your name to download a certificate.</p>
-      <p class="small">Tip: If you select <em>Watch</em>, you must watch the segment’s video to completion. If you select <em>Read</em>, scroll and read the content then take the quiz.</p>
       <div class="actions">
         <button id="startBtn" class="btn">Start Training</button>
         <span id="overallProgress" class="pill" aria-live="polite">Progress: 0 / 4 complete</span>
@@ -378,7 +378,7 @@
     let player2;
     function onYouTubeIframeAPIReady(){
       // Segment 2: your phishing video
-      player2 = new YT.Player('player2', {
+      const playerConfig = {
         videoId: 'WNVTGTrWcvw',
         playerVars: { controls:1, rel:0, modestbranding:1, fs:0, playsinline:1 },
         events: {
@@ -391,7 +391,11 @@
             }
           }
         }
-      });
+      };
+      if(typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null'){
+        playerConfig.playerVars.origin = window.location.origin;
+      }
+      player2 = new YT.Player('player2', playerConfig);
     }
 
     // --- Helpers ---
@@ -416,6 +420,26 @@
         el.removeAttribute('aria-disabled');
         const banner = el.querySelector('.lock-banner');
         if(banner) banner.style.display = 'none';
+      }
+    }
+
+    function toggleCertLock(locked){
+      const certEl = byId('certCard');
+      if(locked){
+        certEl.classList.add('locked');
+        certEl.setAttribute('aria-disabled','true');
+        const banner = certEl.querySelector('.lock-banner');
+        if(banner) banner.style.display = 'flex';
+        byId('genCertBtn').disabled = true;
+        const status = byId('certStatus');
+        status.textContent = '';
+        status.className = 'status';
+      } else {
+        certEl.classList.remove('locked');
+        certEl.removeAttribute('aria-disabled');
+        const banner = certEl.querySelector('.lock-banner');
+        if(banner) banner.style.display = 'none';
+        byId('genCertBtn').disabled = false;
       }
     }
     function setMode(n, mode){
@@ -467,15 +491,7 @@
 
       // enable certificate when all done
       const allDone = [1,2,3,4].every(n=>state.complete[n]);
-      if(allDone){
-        lockSeg('certCard', false); // unlock cert card
-        const certEl = byId('certCard');
-        certEl.classList.remove('locked');
-        certEl.removeAttribute('aria-disabled');
-        const banner = certEl.querySelector('.lock-banner');
-        if(banner) banner.style.display='none';
-        byId('genCertBtn').disabled = false;
-      }
+      toggleCertLock(!allDone);
     }
 
     // Start button
@@ -488,12 +504,7 @@
 
     // Initialize locks
     lockSeg(1,true); lockSeg(2,true); lockSeg(3,true); lockSeg(4,true);
-    // Cert initially locked (reuse the lock function by id trick)
-    (function lockCert(){
-      const certEl = byId('certCard');
-      certEl.classList.add('locked');
-      certEl.setAttribute('aria-disabled','true');
-    })();
+    toggleCertLock(true);
 
     // Mode radio handlers
     for(let n of [1,2,3,4]){
