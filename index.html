@@ -95,18 +95,129 @@
         <h2>Segment 1 — Passwords & Multi-Factor Authentication</h2>
         <div class="section-controls">
           <span class="pill">Mode</span>
-          <label><input type="radio" name="mode1" value="read" checked> Read</label>
+          <label><input type="radio" name="mode1" value="read" checked> Read or Listen</label>
           <label class="muted"><input type="radio" name="mode1" value="watch" disabled> Watch (no video configured)</label>
           <span id="modeNote1" class="small muted">Read the notes below, then take the quiz.</span>
         </div>
         <div class="hr"></div>
         <div class="content-read" id="read1">
-          <p><strong>Key ideas:</strong> Use long unique passphrases, never reuse passwords on important accounts, and turn on multi-factor authentication (MFA) wherever offered.</p>
-          <ul>
-            <li>Passphrases (several words) are easier to remember yet strong.</li>
-            <li>Use a password manager to generate and store unique passwords.</li>
-            <li>MFA stops most account takeovers even if a password leaks.</li>
-          </ul>
+          <article>
+            <h3>Passwords &amp; Multi-Factor Authentication</h3>
+            <div class="hr"></div>
+            <section>
+              <h4>Why Password Strength Matters</h4>
+              <p>Passwords are a common target for attackers because people tend to reuse them or choose ones that are easy to guess. If one weak password is exposed, attackers may use it to try to access more important accounts, including work systems, bank logins, or email.</p>
+              <ul>
+                <li>Attackers use stolen password lists from data breaches.</li>
+                <li>They try the same password across multiple sites (<strong>credential stuffing</strong>).</li>
+                <li>Personal details (pet names, birthdays) make passwords easier to guess.</li>
+              </ul>
+              <p><strong>Examples of what attackers look for:</strong></p>
+              <ul>
+                <li>Password used more than once</li>
+                <li>Password based on public information</li>
+                <li>Password that follows predictable patterns (season + year, for example)</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4>What Makes a Strong Password</h4>
+              <p>The most important part of password strength is <strong>length and randomness</strong>. A <strong>passphrase</strong> — several unrelated words — is easier to remember and harder to break than a short, complex password.</p>
+              <p><strong>Weak / Unsafe Password Examples</strong></p>
+              <ul>
+                <li><code>Summer2024!</code> (predictable pattern)</li>
+                <li><code>Password123</code> (very common)</li>
+                <li><code>Ravens2019</code> (personal interest + date)</li>
+                <li><code>M!llieTheDog</code> (pet name — easy to find on social media)</li>
+              </ul>
+              <p><strong>Strong / Recommended Passphrase Examples</strong></p>
+              <ul>
+                <li><code>ocean-window-leaf-drift</code></li>
+                <li><code>library-pine-travel-river</code></li>
+                <li><code>candle-harbor-orange-stone</code></li>
+              </ul>
+              <ul>
+                <li>Longer = significantly harder to crack.</li>
+                <li>Unrelated words make it resistant to guessing tools.</li>
+                <li>Easier to remember than symbol-heavy passwords.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4>Using a Password Manager</h4>
+              <p>A password manager helps you avoid reusing passwords by storing them securely and generating strong ones automatically. You only need to remember one strong passphrase for the password manager itself.</p>
+              <ul>
+                <li>Generates long, unique passwords for every website.</li>
+                <li>Stores passwords in encrypted form.</li>
+                <li>Autofills login information across devices.</li>
+                <li>Reduces stress of remembering dozens of logins.</li>
+              </ul>
+              <p><strong>Example workflow:</strong></p>
+              <ul>
+                <li>You create one strong passphrase: <code>river-cloud-granite-sun</code></li>
+                <li>The password manager generates secure passwords like: <code>F93!aYql0TZ)3$wLd4</code></li>
+                <li>You never need to type the complex ones — the manager fills them for you.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4>Multi-Factor Authentication (MFA)</h4>
+              <p>MFA adds a second step during login to confirm your identity. Even if someone steals your password, they still cannot access your account without the second factor.</p>
+              <ul>
+                <li>Something you <strong>know</strong> (your password)</li>
+                <li>Something you <strong>have</strong> (phone, authenticator code, or hardware key)</li>
+              </ul>
+              <p><strong>Common MFA Options</strong></p>
+              <ul>
+                <li>Authenticator app (e.g., Microsoft Authenticator, Google Authenticator)</li>
+                <li>Push approval notification (“Are you signing in?”)</li>
+                <li>Hardware security key (most secure option)</li>
+                <li>SMS text code (better than nothing, but less secure)</li>
+              </ul>
+              <p><strong>Example:</strong> Someone steals your email password. They try to log in — but your authenticator app prompts you. You deny the request → the attacker is blocked.</p>
+            </section>
+
+            <section>
+              <h4>Backup &amp; Recovery</h4>
+              <p>If you lose or replace your phone, you need a backup way to log in. Planning ahead prevents lockouts.</p>
+              <ul>
+                <li>Save recovery codes in your password manager or secure location.</li>
+                <li>Add a second authentication device if available.</li>
+                <li>Make sure recovery phone numbers and backup emails are up to date.</li>
+              </ul>
+              <p><strong>Example storage method:</strong> Store printed recovery codes in a sealed envelope at home in a private place — not in your wallet or desk.</p>
+            </section>
+
+            <section>
+              <h4>Common Pitfalls to Avoid</h4>
+              <p>Even with strong passwords and MFA, habits matter. Some behaviors can undo the protection.</p>
+              <ul>
+                <li>Reusing the same password across accounts.</li>
+                <li>Using passwords based on personal or public information.</li>
+                <li>Approving MFA notifications you didn’t request.</li>
+                <li>Clicking login links from emails instead of navigating directly.</li>
+                <li>Storing passwords in notes apps, screenshots, or on paper near your desk.</li>
+              </ul>
+              <p><strong>Better alternatives:</strong></p>
+              <ul>
+                <li>Use a password manager for every login.</li>
+                <li>Decline unexpected MFA requests — report them.</li>
+                <li>Type website addresses manually or use bookmarks.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4>Key Takeaways</h4>
+              <ul>
+                <li>Use <strong>long passphrases</strong> instead of short, complex passwords.</li>
+                <li>Never reuse passwords — especially for email or work.</li>
+                <li>Use a <strong>password manager</strong> to make this easy.</li>
+                <li>Enable <strong>MFA</strong> wherever possible, starting with email.</li>
+                <li>Save <strong>backup codes</strong> securely in case you lose your device.</li>
+              </ul>
+              <p>These steps significantly reduce the chances of someone accessing your account without permission.</p>
+            </section>
+          </article>
         </div>
 
         <form id="quiz1">
@@ -155,7 +266,7 @@
         <h2>Segment 2 — Phishing & Suspicious Messages</h2>
         <div class="section-controls">
           <span class="pill">Mode</span>
-          <label><input type="radio" name="mode2" value="read"> Read</label>
+          <label><input type="radio" name="mode2" value="read"> Read or Listen</label>
           <label><input type="radio" name="mode2" value="watch" checked> Watch</label>
           <span id="modeNote2" class="small muted">If Watch is selected, you must finish the video.</span>
         </div>
@@ -223,7 +334,7 @@
         <h2>Segment 3 — Device Safety & Public Networks</h2>
         <div class="section-controls">
           <span class="pill">Mode</span>
-          <label><input type="radio" name="mode3" value="read" checked> Read</label>
+          <label><input type="radio" name="mode3" value="read" checked> Read or Listen</label>
           <label class="muted"><input type="radio" name="mode3" value="watch" disabled> Watch (no video configured)</label>
           <span id="modeNote3" class="small muted">Read the notes below, then take the quiz.</span>
         </div>
@@ -284,7 +395,7 @@
         <h2>Segment 4 — Data Handling & Real-World Scenarios</h2>
         <div class="section-controls">
           <span class="pill">Mode</span>
-          <label><input type="radio" name="mode4" value="read" checked> Read</label>
+          <label><input type="radio" name="mode4" value="read" checked> Read or Listen</label>
           <label class="muted"><input type="radio" name="mode4" value="watch" disabled> Watch (no video configured)</label>
           <span id="modeNote4" class="small muted">Read the notes below, then take the quiz.</span>
         </div>
