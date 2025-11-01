@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cybersecurity Awareness Training</title>
+<style>
+  :root{
+    --bg:#f2f3f5;          /* light gray background */
+    --card:#ffffff;        /* white cards */
+    --muted:#9aa3af;       /* gray text */
+    --text:#111827;        /* near-black text */
+    --primary:#2563eb;     /* blue buttons */
+    --primary-700:#1d4ed8;
+    --success:#16a34a;
+    --warn:#d97706;
+    --danger:#dc2626;
+    --border:#e5e7eb;
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+  .container{max-width:950px;margin:0 auto;padding:24px;}
+  .intro{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.04);position:sticky;top:0;z-index:5;
+  }
+  h1{margin:0 0 8px 0;font-size:28px;line-height:1.2;}
+  p.lead{margin:0 0 12px 0;color:#374151}
+  .small{font-size:14px;color:#4b5563}
+  .btn{
+    display:inline-block;border:0;border-radius:10px;background:var(--primary);color:#fff;
+    padding:10px 16px;font-weight:600;cursor:pointer;transition:.2s box-shadow,.2s background;
+  }
+  .btn:hover{background:var(--primary-700)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .row{display:grid;grid-template-columns:1fr;gap:18px;margin-top:18px}
+  @media(min-width:860px){ .row{grid-template-columns:1fr 1fr} }
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;
+    box-shadow:0 2px 10px rgba(0,0,0,.04);position:relative;overflow:hidden;
+  }
+  .card.locked{opacity:.5}
+  .card .lock-banner{
+    position:absolute;inset:0;background:repeating-linear-gradient(45deg,#00000010 0 12px,#00000008 12px 24px);
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:#374151;pointer-events:none;
+  }
+  .card h2{margin:0 0 8px 0;font-size:20px}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+    padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:#374151;background:#f9fafb}
+  .section-controls{display:flex;align-items:center;gap:12px;margin:10px 0 12px 0}
+  .video-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000}
+  .video-16x9{aspect-ratio:16/9;}
+  .muted{color:var(--muted)}
+  fieldset{border:0;padding:0;margin:12px 0}
+  .q{margin:10px 0 14px 0;padding-bottom:6px;border-bottom:1px dashed var(--border)}
+  .q p{margin:0 0 6px 0}
+  label{display:block;cursor:pointer}
+  .status{margin-top:8px;font-weight:600}
+  .status.ok{color:var(--success)}
+  .status.warn{color:var(--warn)}
+  .status.err{color:var(--danger)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .toc{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+  .toc .seg{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);
+    border-radius:10px;background:#fff;font-size:12px}
+  .hr{height:1px;background:var(--border);margin:12px 0}
+  .footer-card{grid-column:1/-1}
+  input[type="text"]{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;width:100%;max-width:360px}
+</style>
+</head>
+<body>
+  <div class="container">
+    <!-- Intro (always visible) -->
+    <div class="intro">
+      <h1>Cybersecurity Awareness Training</h1>
+      <p class="lead">This short course has four segments. Choose to <strong>read</strong> or <strong>watch</strong> in each segment, then pass a 5-question quiz (score 4/5) to unlock the next segment. After all four are complete, enter your name to download a certificate.</p>
+      <p class="small">Tip: If you select <em>Watch</em>, you must watch the segment’s video to completion. If you select <em>Read</em>, scroll and read the content then take the quiz.</p>
+      <div class="actions">
+        <button id="startBtn" class="btn">Start Training</button>
+        <span id="overallProgress" class="pill" aria-live="polite">Progress: 0 / 4 complete</span>
+      </div>
+      <div class="toc" id="toc">
+        <div class="seg" id="toc-s1">◻︎ Segment 1</div>
+        <div class="seg" id="toc-s2">◻︎ Segment 2</div>
+        <div class="seg" id="toc-s3">◻︎ Segment 3</div>
+        <div class="seg" id="toc-s4">◻︎ Segment 4</div>
+      </div>
+    </div>
+
+    <!-- Segments grid -->
+    <div class="row" id="segments">
+
+      <!-- Segment 1 -->
+      <section class="card locked" id="seg1" aria-disabled="true">
+        <div class="lock-banner">Locked — press <strong>Start</strong> above</div>
+        <h2>Segment 1 — Passwords & Multi-Factor Authentication</h2>
+        <div class="section-controls">
+          <span class="pill">Mode</span>
+          <label><input type="radio" name="mode1" value="read" checked> Read</label>
+          <label class="muted"><input type="radio" name="mode1" value="watch" disabled> Watch (no video configured)</label>
+          <span id="modeNote1" class="small muted">Read the notes below, then take the quiz.</span>
+        </div>
+        <div class="hr"></div>
+        <div class="content-read" id="read1">
+          <p><strong>Key ideas:</strong> Use long unique passphrases, never reuse passwords on important accounts, and turn on multi-factor authentication (MFA) wherever offered.</p>
+          <ul>
+            <li>Passphrases (several words) are easier to remember yet strong.</li>
+            <li>Use a password manager to generate and store unique passwords.</li>
+            <li>MFA stops most account takeovers even if a password leaks.</li>
+          </ul>
+        </div>
+
+        <form id="quiz1">
+          <fieldset>
+            <div class="q">
+              <p>1) Which is the best example of a strong passphrase?</p>
+              <label><input type="radio" name="q1a" value="a"> Spring2024!</label>
+              <label><input type="radio" name="q1a" value="b"> river-cloud-granite-sun</label>
+              <label><input type="radio" name="q1a" value="c"> Password1</label>
+            </div>
+            <div class="q">
+              <p>2) Why is password reuse risky?</p>
+              <label><input type="radio" name="q1b" value="a"> It makes logins slower</label>
+              <label><input type="radio" name="q1b" value="b"> A breach on one site can unlock others</label>
+              <label><input type="radio" name="q1b" value="c"> Reuse is recommended</label>
+            </div>
+            <div class="q">
+              <p>3) MFA adds…</p>
+              <label><input type="radio" name="q1c" value="a"> A screen color change</label>
+              <label><input type="radio" name="q1c" value="b"> A second proof it’s really you</label>
+              <label><input type="radio" name="q1c" value="c"> Faster internet</label>
+            </div>
+            <div class="q">
+              <p>4) Which accounts should have MFA?</p>
+              <label><input type="radio" name="q1d" value="a"> Only social media</label>
+              <label><input type="radio" name="q1d" value="b"> Important accounts like email, finance, work</label>
+              <label><input type="radio" name="q1d" value="c"> None</label>
+            </div>
+            <div class="q">
+              <p>5) Longer passwords are generally stronger.</p>
+              <label><input type="radio" name="q1e" value="a"> True</label>
+              <label><input type="radio" name="q1e" value="b"> False</label>
+            </div>
+          </fieldset>
+          <div class="actions">
+            <button type="button" class="btn" onclick="submitQuiz(1)">Submit Quiz</button>
+            <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(1)">Reset Segment</button>
+          </div>
+          <div id="status1" class="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <!-- Segment 2 -->
+      <section class="card locked" id="seg2" aria-disabled="true">
+        <div class="lock-banner">Locked — complete Segment 1</div>
+        <h2>Segment 2 — Phishing & Suspicious Messages</h2>
+        <div class="section-controls">
+          <span class="pill">Mode</span>
+          <label><input type="radio" name="mode2" value="read"> Read</label>
+          <label><input type="radio" name="mode2" value="watch" checked> Watch</label>
+          <span id="modeNote2" class="small muted">If Watch is selected, you must finish the video.</span>
+        </div>
+
+        <!-- Watch mode: YouTube embed -->
+        <div class="video-wrap video-16x9" id="videoWrap2">
+          <div id="player2"></div>
+        </div>
+        <p class="small muted">Video source: <a href="https://www.youtube.com/watch?v=WNVTGTrWcvw" target="_blank" rel="noopener">Phishing video</a></p>
+
+        <!-- Read mode content -->
+        <div class="content-read" id="read2" style="display:none">
+          <p><strong>Red flags:</strong> unexpected password resets, urgent tone, strange sender, links that don’t match the display text, requests for sensitive info.</p>
+          <ul>
+            <li>Pause and verify via a known channel if something feels off.</li>
+            <li>Hover or long-press links to preview where they go.</li>
+            <li>Report suspicious messages to your IT/contact.</li>
+          </ul>
+        </div>
+
+        <form id="quiz2">
+          <fieldset>
+            <div class="q">
+              <p>1) Which is a phishing red flag?</p>
+              <label><input type="radio" name="q2a" value="a"> Urgent pressure to act now</label>
+              <label><input type="radio" name="q2a" value="b"> Greeting by your correct name</label>
+              <label><input type="radio" name="q2a" value="c"> Clear grammar, plain language</label>
+            </div>
+            <div class="q">
+              <p>2) Before clicking a link you should…</p>
+              <label><input type="radio" name="q2b" value="a"> Click immediately</label>
+              <label><input type="radio" name="q2b" value="b"> Hover/preview to confirm the real destination</label>
+              <label><input type="radio" name="q2b" value="c"> Forward it to everyone</label>
+            </div>
+            <div class="q">
+              <p>3) Phishing can appear via…</p>
+              <label><input type="radio" name="q2c" value="a"> Email only</label>
+              <label><input type="radio" name="q2c" value="b"> Email, text, social media, chats</label>
+              <label><input type="radio" name="q2c" value="c"> Paper mail only</label>
+            </div>
+            <div class="q">
+              <p>4) Best action if you’re unsure about a message?</p>
+              <label><input type="radio" name="q2d" value="a"> Reply with your password</label>
+              <label><input type="radio" name="q2d" value="b"> Verify using a known contact method</label>
+              <label><input type="radio" name="q2d" value="c"> Delete your email account</label>
+            </div>
+            <div class="q">
+              <p>5) An odd sender address is…</p>
+              <label><input type="radio" name="q2e" value="a"> A normal variance</label>
+              <label><input type="radio" name="q2e" value="b"> A possible sign of phishing</label>
+              <label><input type="radio" name="q2e" value="c"> Always safe</label>
+            </div>
+          </fieldset>
+          <div class="actions">
+            <button type="button" class="btn" onclick="submitQuiz(2)">Submit Quiz</button>
+            <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(2)">Reset Segment</button>
+          </div>
+          <div id="status2" class="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <!-- Segment 3 -->
+      <section class="card locked" id="seg3" aria-disabled="true">
+        <div class="lock-banner">Locked — complete Segment 2</div>
+        <h2>Segment 3 — Device Safety & Public Networks</h2>
+        <div class="section-controls">
+          <span class="pill">Mode</span>
+          <label><input type="radio" name="mode3" value="read" checked> Read</label>
+          <label class="muted"><input type="radio" name="mode3" value="watch" disabled> Watch (no video configured)</label>
+          <span id="modeNote3" class="small muted">Read the notes below, then take the quiz.</span>
+        </div>
+        <div class="hr"></div>
+        <div class="content-read" id="read3">
+          <p><strong>Key ideas:</strong> Use updates, lock screens, avoid public Wi-Fi or use VPN/hotspot, never plug in unknown USB devices.</p>
+          <ul>
+            <li>Public Wi-Fi exposes traffic; attackers can snoop.</li>
+            <li>Automatic updates patch known vulnerabilities.</li>
+            <li>Lock your screen when you step away.</li>
+          </ul>
+        </div>
+
+        <form id="quiz3">
+          <fieldset>
+            <div class="q">
+              <p>1) Why are open public Wi-Fi networks risky?</p>
+              <label><input type="radio" name="q3a" value="a"> They’re too fast</label>
+              <label><input type="radio" name="q3a" value="b"> Traffic can be intercepted</label>
+              <label><input type="radio" name="q3a" value="c"> They block ads</label>
+            </div>
+            <div class="q">
+              <p>2) Updates are important because…</p>
+              <label><input type="radio" name="q3b" value="a"> They add wallpapers</label>
+              <label><input type="radio" name="q3b" value="b"> They patch security flaws</label>
+              <label><input type="radio" name="q3b" value="c"> They drain the battery only</label>
+            </div>
+            <div class="q">
+              <p>3) Before stepping away you should…</p>
+              <label><input type="radio" name="q3c" value="a"> Leave your laptop open</label>
+              <label><input type="radio" name="q3c" value="b"> Lock your screen</label>
+              <label><input type="radio" name="q3c" value="c"> Unplug the monitor</label>
+            </div>
+            <div class="q">
+              <p>4) Unknown USB drives…</p>
+              <label><input type="radio" name="q3d" value="a"> Are safe if new</label>
+              <label><input type="radio" name="q3d" value="b"> May contain malware</label>
+              <label><input type="radio" name="q3d" value="c"> Improve Wi-Fi</label>
+            </div>
+            <div class="q">
+              <p>5) Safer option than open Wi-Fi?</p>
+              <label><input type="radio" name="q3e" value="a"> Personal hotspot or VPN</label>
+              <label><input type="radio" name="q3e" value="b"> Random USB stick</label>
+              <label><input type="radio" name="q3e" value="c"> Disabling updates</label>
+            </div>
+          </fieldset>
+          <div class="actions">
+            <button type="button" class="btn" onclick="submitQuiz(3)">Submit Quiz</button>
+            <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(3)">Reset Segment</button>
+          </div>
+          <div id="status3" class="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <!-- Segment 4 -->
+      <section class="card locked" id="seg4" aria-disabled="true">
+        <div class="lock-banner">Locked — complete Segment 3</div>
+        <h2>Segment 4 — Data Handling & Real-World Scenarios</h2>
+        <div class="section-controls">
+          <span class="pill">Mode</span>
+          <label><input type="radio" name="mode4" value="read" checked> Read</label>
+          <label class="muted"><input type="radio" name="mode4" value="watch" disabled> Watch (no video configured)</label>
+          <span id="modeNote4" class="small muted">Read the notes below, then take the quiz.</span>
+        </div>
+        <div class="hr"></div>
+        <div class="content-read" id="read4">
+          <p><strong>Key ideas:</strong> Verify identity before sharing sensitive info, use secure channels, and ask if unsure. Apply the “pause → verify → proceed” habit.</p>
+          <ul>
+            <li>Don’t email confidential data without protection.</li>
+            <li>Confirm requests via a known contact method.</li>
+            <li>When in doubt, stop and ask.</li>
+          </ul>
+        </div>
+
+        <form id="quiz4">
+          <fieldset>
+            <div class="q">
+              <p>1) Before sharing sensitive information you should…</p>
+              <label><input type="radio" name="q4a" value="a"> Verify who’s asking and why</label>
+              <label><input type="radio" name="q4a" value="b"> Send it right away</label>
+              <label><input type="radio" name="q4a" value="c"> Post it to chat</label>
+            </div>
+            <div class="q">
+              <p>2) Safer channel for confidential files?</p>
+              <label><input type="radio" name="q4b" value="a"> Public social media</label>
+              <label><input type="radio" name="q4b" value="b"> Approved encrypted storage/link</label>
+              <label><input type="radio" name="q4b" value="c"> Unsecured personal email</label>
+            </div>
+            <div class="q">
+              <p>3) If an email feels “off”, you should…</p>
+              <label><input type="radio" name="q4c" value="a"> Ignore instincts</label>
+              <label><input type="radio" name="q4c" value="b"> Pause and verify</label>
+              <label><input type="radio" name="q4c" value="c"> Forward to your contacts</label>
+            </div>
+            <div class="q">
+              <p>4) Sharing passwords with coworkers is…</p>
+              <label><input type="radio" name="q4d" value="a"> Fine if you trust them</label>
+              <label><input type="radio" name="q4d" value="b"> Not acceptable; use access controls</label>
+              <label><input type="radio" name="q4d" value="c"> Encouraged</label>
+            </div>
+            <div class="q">
+              <p>5) Best immediate action if you sent data to the wrong person?</p>
+              <label><input type="radio" name="q4e" value="a"> Do nothing</label>
+              <label><input type="radio" name="q4e" value="b"> Notify your support/IT immediately</label>
+              <label><input type="radio" name="q4e" value="c"> Tweet about it</label>
+            </div>
+          </fieldset>
+          <div class="actions">
+            <button type="button" class="btn" onclick="submitQuiz(4)">Submit Quiz</button>
+            <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(4)">Reset Segment</button>
+          </div>
+          <div id="status4" class="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <!-- Certificate -->
+      <section class="card footer-card locked" id="certCard" aria-disabled="true">
+        <div class="lock-banner">Locked — complete all 4 segments</div>
+        <h2>Certificate of Completion</h2>
+        <p>Enter your full name exactly as you’d like it to appear on the certificate.</p>
+        <input id="learnerName" type="text" placeholder="Your full name" />
+        <div class="actions">
+          <button class="btn" id="genCertBtn" onclick="generateCertificate()" disabled>Generate Certificate (PDF)</button>
+          <span id="certStatus" class="status" aria-live="polite"></span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- YouTube IFrame API (for Segment 2 Watch mode) -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- jsPDF for certificate -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-YkGJQ9r/6MPQx+ejwS3X0QW5vJk6d5lWfF0CwQh3g8i3xQq4F3u6y6bUQnqR2Wc1pM5s6s8nq7o6x0+fQW8KxA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    // ------- Simple in-memory state (easy to swap to localStorage later) -------
+    const state = {
+      started: false,
+      // video completion flags (for Watch mode)
+      videoDone: { 1:false, 2:false, 3:false, 4:false },
+      // quiz scores
+      quizScore: { 1:null, 2:null, 3:null, 4:null },
+      // segment completion
+      complete: { 1:false, 2:false, 3:false, 4:false },
+      // locked/ready
+      locked: { 1:true, 2:true, 3:true, 4:true },
+      // chosen modes
+      mode: { 1:'read', 2:'watch', 3:'read', 4:'read' }
+    };
+
+    // YouTube player for segment 2
+    let player2;
+    function onYouTubeIframeAPIReady(){
+      // Segment 2: your phishing video
+      player2 = new YT.Player('player2', {
+        videoId: 'WNVTGTrWcvw',
+        playerVars: { controls:1, rel:0, modestbranding:1, fs:0, playsinline:1 },
+        events: {
+          'onStateChange': (e)=>{
+            if(e.data === YT.PlayerState.ENDED){
+              state.videoDone[2] = true;
+              document.getElementById('status2').textContent = 'Video complete ✔ You may submit the quiz when ready.';
+              document.getElementById('status2').className = 'status ok';
+              updateTOC();
+            }
+          }
+        }
+      });
+    }
+
+    // --- Helpers ---
+    const byId = (id)=>document.getElementById(id);
+    function lockSeg(n, locked){
+      const el = byId('seg'+n);
+      state.locked[n] = !!locked;
+      if(locked){
+        el.classList.add('locked');
+        el.setAttribute('aria-disabled','true');
+        // show lock banner
+        if(!el.querySelector('.lock-banner')){
+          const b = document.createElement('div');
+          b.className = 'lock-banner';
+          b.textContent = 'Locked — complete previous segment';
+          el.appendChild(b);
+        } else {
+          el.querySelector('.lock-banner').style.display = 'flex';
+        }
+      } else {
+        el.classList.remove('locked');
+        el.removeAttribute('aria-disabled');
+        const banner = el.querySelector('.lock-banner');
+        if(banner) banner.style.display = 'none';
+      }
+    }
+    function setMode(n, mode){
+      state.mode[n] = mode;
+      const note = byId('modeNote'+n);
+      const readBlock = byId('read'+n);
+      const hasVideo = (n === 2); // only seg2 has a video configured in this starter
+      if(mode === 'watch'){
+        if(n===2){
+          byId('videoWrap2').style.display = '';
+          readBlock.style.display = 'none';
+          note.textContent = 'Watch the video to completion, then pass the quiz (4/5).';
+        } else {
+          note.textContent = 'No video available for this segment; switched to Read mode.';
+        }
+      } else {
+        if(n===2){
+          byId('videoWrap2').style.display = 'none';
+          readBlock.style.display = '';
+        } else {
+          readBlock.style.display = '';
+        }
+        note.textContent = 'Read the notes below, then pass the quiz (4/5).';
+      }
+
+      // For segments without videos, force read
+      if(mode === 'watch' && !hasVideo){
+        // revert to read
+        const inputs = document.querySelectorAll(`input[name="mode${n}"]`);
+        inputs.forEach(i=>{ if(i.value==='read') i.checked = true; });
+        state.mode[n] = 'read';
+      }
+    }
+
+    function updateTOC(){
+      let doneCount = 0;
+      for(let i=1;i<=4;i++){
+        const el = byId('toc-s'+i);
+        if(state.complete[i]){
+          el.textContent = '✅ Segment ' + i;
+          doneCount++;
+        } else if(!state.locked[i]){
+          el.textContent = '⏳ Segment ' + i;
+        } else {
+          el.textContent = '◻︎ Segment ' + i;
+        }
+      }
+      byId('overallProgress').textContent = `Progress: ${doneCount} / 4 complete`;
+
+      // enable certificate when all done
+      const allDone = [1,2,3,4].every(n=>state.complete[n]);
+      if(allDone){
+        lockSeg('certCard', false); // unlock cert card
+        const certEl = byId('certCard');
+        certEl.classList.remove('locked');
+        certEl.removeAttribute('aria-disabled');
+        const banner = certEl.querySelector('.lock-banner');
+        if(banner) banner.style.display='none';
+        byId('genCertBtn').disabled = false;
+      }
+    }
+
+    // Start button
+    byId('startBtn').addEventListener('click', ()=>{
+      if(state.started) return;
+      state.started = true;
+      lockSeg(1,false); // unlock segment 1
+      updateTOC();
+    });
+
+    // Initialize locks
+    lockSeg(1,true); lockSeg(2,true); lockSeg(3,true); lockSeg(4,true);
+    // Cert initially locked (reuse the lock function by id trick)
+    (function lockCert(){
+      const certEl = byId('certCard');
+      certEl.classList.add('locked');
+      certEl.setAttribute('aria-disabled','true');
+    })();
+
+    // Mode radio handlers
+    for(let n of [1,2,3,4]){
+      const radios = document.querySelectorAll(`input[name="mode${n}"]`);
+      radios.forEach(r=>{
+        r.addEventListener('change', ()=> setMode(n, r.value));
+      });
+      // set initial
+      const checked = Array.from(radios).find(r=>r.checked)?.value || 'read';
+      setMode(n, checked);
+    }
+
+    // Quiz answer keys
+    const keys = {
+      1: { q1a:'b', q1b:'b', q1c:'b', q1d:'b', q1e:'a' },
+      2: { q2a:'a', q2b:'b', q2c:'b', q2d:'b', q2e:'b' },
+      3: { q3a:'b', q3b:'b', q3c:'b', q3d:'b', q3e:'a' },
+      4: { q4a:'a', q4b:'b', q4c:'b', q4d:'b', q4e:'b' }
+    };
+
+    function submitQuiz(n){
+      // Gate on mode/video completion if watching
+      if(state.mode[n] === 'watch'){
+        if(n===2 && !state.videoDone[2]){
+          const st = byId('status'+n);
+          st.textContent = 'Please finish the video before submitting the quiz.';
+          st.className = 'status warn';
+          return;
+        }
+      }
+
+      const form = byId('quiz'+n);
+      const answers = keys[n];
+      let score = 0, total = 5;
+      for(const k of Object.keys(answers)){
+        const sel = form.querySelector(`input[name="${k}"]:checked`);
+        if(sel && sel.value === answers[k]) score++;
+      }
+      state.quizScore[n] = score;
+
+      const st = byId('status'+n);
+      if(score >= 4){
+        st.textContent = `Passed ✔ (${score}/5). Segment complete.`;
+        st.className = 'status ok';
+        state.complete[n] = true;
+        // unlock next segment
+        if(n<4) lockSeg(n+1, false);
+        updateTOC();
+      } else {
+        // FAIL RULE: relock & reset
+        st.textContent = `Score ${score}/5 — You must score 4/5. Segment has been reset. Please rewatch/reread and try again.`;
+        st.className = 'status err';
+        resetSegment(n, /*silent=*/true);
+        lockSeg(n, false); // keep current open but reset content
+      }
+    }
+
+    function resetSegment(n, silent){
+      // Clear radio selections
+      const form = byId('quiz'+n);
+      const inputs = form.querySelectorAll('input[type="radio"]');
+      inputs.forEach(i=> i.checked = false);
+
+      // Reset status
+      const st = byId('status'+n);
+      if(!silent){ st.textContent = 'Segment reset.'; st.className = 'status'; }
+      else { st.textContent = ''; st.className = 'status'; }
+
+      // Reset video flag if any
+      state.videoDone[n] = false;
+      state.quizScore[n] = null;
+      state.complete[n] = false;
+
+      // If segment had a player and was at end, seek to 0
+      if(n===2 && player2 && typeof player2.seekTo === 'function'){
+        try { player2.seekTo(0,true); player2.pauseVideo && player2.pauseVideo(); } catch(e){}
+      }
+      updateTOC();
+    }
+
+    // Certificate
+    async function generateCertificate(){
+      const name = (byId('learnerName').value || '').trim();
+      if(!name){
+        byId('certStatus').textContent = 'Please enter your name.';
+        byId('certStatus').className = 'status warn';
+        return;
+      }
+      // Check all segments complete
+      const allDone = [1,2,3,4].every(n=>state.complete[n]);
+      if(!allDone){
+        byId('certStatus').textContent = 'Complete all segments first.';
+        byId('certStatus').className = 'status warn';
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'pt', format:'letter' });
+
+      // Header
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(24);
+      doc.text('Certificate of Completion', 72, 90);
+
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(12);
+      doc.text('This certifies that', 72, 125);
+
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(18);
+      doc.text(name, 72, 150);
+
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(12);
+      doc.text('has successfully completed the Cybersecurity Awareness Training.', 72, 175);
+
+      const date = new Date().toLocaleDateString();
+      doc.text(`Date: ${date}`, 72, 200);
+
+      // Checklist
+      doc.setFont('helvetica','bold');
+      doc.text('Completed Segments', 72, 240);
+      doc.setFont('helvetica','normal');
+      const lines = [
+        `1) Passwords & MFA  — ${state.complete[1] ? '✅' : '⚠️'}`,
+        `2) Phishing         — ${state.complete[2] ? '✅' : '⚠️'}`,
+        `3) Device Safety    — ${state.complete[3] ? '✅' : '⚠️'}`,
+        `4) Data Handling    — ${state.complete[4] ? '✅' : '⚠️'}`
+      ];
+      let y = 265;
+      lines.forEach(l=>{ doc.text(l, 72, y); y += 22; });
+
+      // Footer
+      doc.setDrawColor(220); doc.line(72, 640, 540, 640);
+      doc.setFontSize(10);
+      doc.text('Issued by: Your Organization', 72, 660);
+
+      doc.save(`Cybersecurity-Certificate-${name.replace(/\s+/g,'_')}.pdf`);
+      byId('certStatus').textContent = 'Certificate generated.';
+      byId('certStatus').className = 'status ok';
+    }
+  </script>
+</body>
+</html>
