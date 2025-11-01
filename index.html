@@ -48,7 +48,8 @@
   .section-controls{display:flex;align-items:center;gap:12px;margin:10px 0 12px 0}
   .video-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000;width:100%;}
   .video-wrap iframe,
-  .video-wrap #player2{width:100%;height:100%;border:0;}
+  .video-wrap #player2,
+  .video-wrap video{width:100%;height:100%;border:0;display:block;}
   .video-16x9{aspect-ratio:16/9;}
   .muted{color:var(--muted)}
   .audio-player{display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:18px;border:1px solid var(--border);border-radius:12px;background:#f9fafb;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);}
@@ -106,12 +107,21 @@
         <h2>Segment 1 — Passwords & Multi-Factor Authentication</h2>
         <div class="section-controls">
           <span class="pill">Mode</span>
-          <label><input type="radio" name="mode1" value="read" checked> Read or Listen</label>
-          <label class="muted"><input type="radio" name="mode1" value="watch" disabled> Watch (no video configured)</label>
-          <span id="modeNote1" class="small muted">Read the notes below, then take the quiz.</span>
+          <label><input type="radio" name="mode1" value="watch" checked> Watch</label>
+          <label><input type="radio" name="mode1" value="read"> Read or Listen</label>
+          <span id="modeNote1" class="small muted">Watch the video to completion, then take the quiz.</span>
         </div>
+
+        <!-- Watch mode: local MP4 -->
+        <div class="video-wrap video-16x9" id="videoWrap1">
+          <video id="video1" controls preload="metadata" src="Your_Digital_Security_Upgrade.mp4">
+            Sorry, your browser doesn't support embedded videos.
+          </video>
+        </div>
+        <p class="small muted" id="videoSource1">Video source: <span aria-hidden="true">Your Digital Security Upgrade</span></p>
+
         <div class="hr"></div>
-        <div class="content-read" id="read1">
+        <div class="content-read" id="read1" style="display:none">
           <div class="audio-player" data-segment="1">
             <button type="button" class="audio-toggle" aria-label="Play audio narration for Passwords and Multi-Factor Authentication" data-play-label="Play audio narration for Passwords and Multi-Factor Authentication" data-pause-label="Pause audio narration for Passwords and Multi-Factor Authentication">
               <span class="audio-icon" aria-hidden="true">▶</span>
@@ -503,7 +513,7 @@
       // locked/ready
       locked: { 1:true, 2:true, 3:true, 4:true },
       // chosen modes
-      mode: { 1:'read', 2:'watch', 3:'read', 4:'read' }
+      mode: { 1:'watch', 2:'watch', 3:'read', 4:'read' }
     };
 
     // YouTube player for segment 2
@@ -532,6 +542,31 @@
 
     // --- Helpers ---
     const byId = (id)=>document.getElementById(id);
+
+    const videoSegments = {
+      1: { type:'html', wrapId:'videoWrap1', videoId:'video1', sourceId:'videoSource1' },
+      2: { type:'youtube', wrapId:'videoWrap2' }
+    };
+
+    const video1El = byId('video1');
+    if(video1El){
+      video1El.addEventListener('play', ()=>{
+        // Reset completion flag when replaying
+        state.videoDone[1] = false;
+        const st = byId('status1');
+        if(st && st.textContent.includes('Video complete')){
+          st.textContent = '';
+          st.className = 'status';
+        }
+      });
+      video1El.addEventListener('ended', ()=>{
+        state.videoDone[1] = true;
+        const st = byId('status1');
+        st.textContent = 'Video complete ✔ You may submit the quiz when ready.';
+        st.className = 'status ok';
+        updateTOC();
+      });
+    }
 
     // Ensure jsPDF is available before trying to create a certificate.
     let ensureJsPdfPromise = null;
@@ -710,27 +745,36 @@
       state.mode[n] = mode;
       const note = byId('modeNote'+n);
       const readBlock = byId('read'+n);
-      const hasVideo = (n === 2); // only seg2 has a video configured in this starter
+      const videoConfig = videoSegments[n];
+      const wrap = videoConfig ? byId(videoConfig.wrapId) : null;
+      const sourceNote = videoConfig?.sourceId ? byId(videoConfig.sourceId) : null;
+      const htmlVideo = (videoConfig?.type === 'html' && videoConfig.videoId) ? byId(videoConfig.videoId) : null;
       if(mode === 'watch'){
-        if(n===2){
-          byId('videoWrap2').style.display = '';
-          readBlock.style.display = 'none';
-          note.textContent = 'Watch the video to completion, then pass the quiz (4/5).';
+        if(videoConfig){
+          if(wrap) wrap.style.display = '';
+          if(sourceNote) sourceNote.style.display = '';
+          if(readBlock) readBlock.style.display = 'none';
+          if(note) note.textContent = 'Watch the video to completion, then pass the quiz (4/5).';
         } else {
-          note.textContent = 'No video available for this segment; switched to Read mode.';
+          if(note) note.textContent = 'No video available for this segment; switched to Read mode.';
         }
       } else {
-        if(n===2){
-          byId('videoWrap2').style.display = 'none';
-          readBlock.style.display = '';
-        } else {
-          readBlock.style.display = '';
+        if(videoConfig){
+          if(wrap) wrap.style.display = 'none';
+          if(sourceNote) sourceNote.style.display = 'none';
+          if(htmlVideo){
+            try {
+              htmlVideo.pause();
+              htmlVideo.currentTime = 0;
+            } catch(err){}
+          }
         }
-        note.textContent = 'Read the notes below, then pass the quiz (4/5).';
+        if(readBlock) readBlock.style.display = '';
+        if(note) note.textContent = 'Read the notes below, then pass the quiz (4/5).';
       }
 
       // For segments without videos, force read
-      if(mode === 'watch' && !hasVideo){
+      if(mode === 'watch' && !videoConfig){
         // revert to read
         const inputs = document.querySelectorAll(`input[name="mode${n}"]`);
         inputs.forEach(i=>{ if(i.value==='read') i.checked = true; });
@@ -792,7 +836,7 @@
     function submitQuiz(n){
       // Gate on mode/video completion if watching
       if(state.mode[n] === 'watch'){
-        if(n===2 && !state.videoDone[2]){
+        if(!state.videoDone[n]){
           const st = byId('status'+n);
           st.textContent = 'Please finish the video before submitting the quiz.';
           st.className = 'status warn';
@@ -843,6 +887,9 @@
       state.complete[n] = false;
 
       // If segment had a player and was at end, seek to 0
+      if(n===1 && video1El){
+        try { video1El.pause(); video1El.currentTime = 0; } catch(e){}
+      }
       if(n===2 && player2 && typeof player2.seekTo === 'function'){
         try { player2.seekTo(0,true); player2.pauseVideo && player2.pauseVideo(); } catch(e){}
       }
