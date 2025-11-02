@@ -53,12 +53,12 @@
   .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
     padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:#374151;background:#f9fafb}
   .section-controls{display:flex;align-items:center;gap:12px;margin:10px 0 12px 0;flex-wrap:wrap}
-  .mode-toggle{position:relative;display:flex;gap:4px;background:#e5e7eb;border-radius:999px;padding:4px;min-width:260px;}
+  .mode-toggle{position:relative;display:flex;gap:4px;background:#e5e7eb;border-radius:999px;padding:4px;min-width:260px;overflow:hidden;}
   .mode-toggle .mode-option{flex:1;border:0;background:transparent;color:#374151;font-weight:600;padding:6px 16px;border-radius:999px;cursor:pointer;position:relative;z-index:1;transition:color .2s ease;white-space:nowrap;}
   .mode-toggle .mode-option[aria-disabled="true"],
   .mode-toggle .mode-option:disabled{cursor:not-allowed;color:var(--muted);}
   .mode-toggle .mode-option.active{color:#fff;}
-  .mode-toggle .mode-thumb{position:absolute;top:4px;left:4px;height:calc(100% - 8px);border-radius:999px;background:#166534;transition:transform .25s ease,width .25s ease;z-index:0;}
+  .mode-toggle .mode-thumb{position:absolute;top:4px;left:4px;height:calc(100% - 8px);border-radius:999px;background:#166534;transition:transform .25s ease,width .25s ease;z-index:0;pointer-events:none;box-shadow:0 1px 4px rgba(22,101,52,0.35);}
   .mode-toggle[data-options="1"]{justify-content:center;}
   .mode-toggle[data-options="1"] .mode-thumb{display:none;}
   .mode-toggle:focus-within{box-shadow:0 0 0 2px rgba(37,99,235,0.25);} 
@@ -538,11 +538,33 @@
       const COMPACT_SCROLL_ON = 120;
       const COMPACT_SCROLL_OFF = 40;
       let isCompact = introEl.classList.contains('compact');
+      const COMPACT_DELAY_MS = 90;
+      let compactTimer = null;
+      let expandTimer = null;
+
+      const clearCompactTimer = ()=>{
+        if(compactTimer){
+          clearTimeout(compactTimer);
+          compactTimer = null;
+        }
+      };
+
+      const clearExpandTimer = ()=>{
+        if(expandTimer){
+          clearTimeout(expandTimer);
+          expandTimer = null;
+        }
+      };
 
       const setCompact = (value)=>{
         if(value !== isCompact){
           isCompact = value;
           introEl.classList.toggle('compact', isCompact);
+        }
+        if(value){
+          clearExpandTimer();
+        } else {
+          clearCompactTimer();
         }
       };
 
@@ -550,10 +572,26 @@
         const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
         if(isCompact){
           if(scrollY <= COMPACT_SCROLL_OFF){
-            setCompact(false);
+            if(!expandTimer){
+              clearCompactTimer();
+              expandTimer = window.setTimeout(()=>{
+                setCompact(false);
+                expandTimer = null;
+              }, COMPACT_DELAY_MS);
+            }
+          } else {
+            clearExpandTimer();
           }
         } else if(scrollY >= COMPACT_SCROLL_ON){
-          setCompact(true);
+          if(!compactTimer){
+            clearExpandTimer();
+            compactTimer = window.setTimeout(()=>{
+              setCompact(true);
+              compactTimer = null;
+            }, COMPACT_DELAY_MS);
+          }
+        } else {
+          clearCompactTimer();
         }
       };
 
@@ -568,6 +606,10 @@
       };
 
       evaluateCompact();
+      const initialScroll = window.scrollY || document.documentElement.scrollTop || 0;
+      if(initialScroll >= COMPACT_SCROLL_ON){
+        setCompact(true);
+      }
       window.addEventListener('scroll', requestEvaluate, { passive:true });
       window.addEventListener('resize', requestEvaluate);
     }
@@ -677,6 +719,10 @@
         const banner = el.querySelector('.lock-banner');
         if(banner) banner.style.display = 'none';
         updateQuizAvailability(n);
+      }
+      const toggleEl = el.querySelector('.mode-toggle');
+      if(toggleEl && typeof toggleEl.__activateMode === 'function'){
+        toggleEl.__activateMode(state.mode[n], {focus:false});
       }
     }
 
@@ -877,68 +923,72 @@
       }
     }
 
-    function positionToggleThumb(toggle){
+    function positionToggleThumb(toggle, activeBtn){
       const thumb = toggle.querySelector('.mode-thumb');
-      const active = toggle.querySelector('.mode-option.active');
+      const active = activeBtn || toggle.querySelector('.mode-option.active') || toggle.querySelector('.mode-option[aria-checked="true"]');
       if(!thumb || !active) return;
       const toggleRect = toggle.getBoundingClientRect();
       const activeRect = active.getBoundingClientRect();
       const offset = activeRect.left - toggleRect.left;
       thumb.style.width = `${activeRect.width}px`;
       thumb.style.transform = `translateX(${offset}px)`;
+      thumb.style.opacity = '1';
     }
 
     function initModeToggle(toggle){
       const segment = Number(toggle.dataset.segment);
       const options = Array.from(toggle.querySelectorAll('.mode-option'));
       toggle.dataset.options = String(options.length);
+      const isDisabled = (btn)=> btn.disabled || btn.getAttribute('aria-disabled') === 'true';
 
       const activate = (mode, {focus} = {})=>{
-        const candidate = options.find(btn=>btn.dataset.mode === mode && !btn.disabled && btn.getAttribute('aria-disabled') !== 'true');
-        const enabledOptions = options.filter(btn=>!btn.disabled && btn.getAttribute('aria-disabled') !== 'true');
-        let target = candidate || enabledOptions[0];
-        if(!target) return;
-        mode = target.dataset.mode;
-        state.mode[segment] = mode;
-        toggle.dataset.active = mode;
+        const preferred = options.find(btn=>btn.dataset.mode === mode);
+        const enabledOptions = options.filter(btn=>!isDisabled(btn));
+        const visualTarget = preferred || enabledOptions[0] || options[0];
+        if(!visualTarget) return;
+        const finalMode = visualTarget.dataset.mode;
+        state.mode[segment] = finalMode;
+        toggle.dataset.active = finalMode;
+        const focusTarget = !isDisabled(visualTarget) ? visualTarget : (enabledOptions[0] || null);
         options.forEach(btn=>{
-          const isActive = btn === target;
+          const isActive = btn === visualTarget;
           btn.classList.toggle('active', isActive);
-          btn.setAttribute('aria-checked', isActive ? 'true' : 'false');
-          if(btn.disabled || btn.getAttribute('aria-disabled') === 'true'){
+          btn.setAttribute('aria-checked', btn.dataset.mode === finalMode ? 'true' : 'false');
+          if(isDisabled(btn)){
+            btn.setAttribute('aria-disabled','true');
             btn.tabIndex = -1;
           } else {
-            btn.tabIndex = isActive ? 0 : -1;
+            btn.removeAttribute('aria-disabled');
+            btn.tabIndex = focusTarget && btn === focusTarget ? 0 : -1;
           }
         });
-        applyMode(segment, mode);
-        requestAnimationFrame(()=> positionToggleThumb(toggle));
-        if(focus){ target.focus(); }
+        applyMode(segment, finalMode);
+        requestAnimationFrame(()=> positionToggleThumb(toggle, visualTarget));
+        if(focus && focusTarget){
+          focusTarget.focus();
+        }
       };
 
       options.forEach(btn=>{
-        const disabled = btn.disabled || btn.getAttribute('aria-disabled') === 'true';
-        if(disabled){
-          btn.setAttribute('aria-disabled','true');
-          btn.tabIndex = -1;
-          return;
-        }
-        btn.addEventListener('click', ()=> activate(btn.dataset.mode, {focus:true}));
+        btn.addEventListener('click', ()=>{
+          if(isDisabled(btn)) return;
+          activate(btn.dataset.mode, {focus:true});
+        });
         btn.addEventListener('keydown', evt=>{
+          if(isDisabled(btn)) return;
           if(evt.key === ' ' || evt.key === 'Enter'){
             evt.preventDefault();
             activate(btn.dataset.mode, {focus:true});
             return;
           }
           if(evt.key === 'ArrowLeft' || evt.key === 'ArrowRight'){
-            const available = options.filter(opt=>!opt.disabled && opt.getAttribute('aria-disabled') !== 'true');
+            const available = options.filter(opt=>!isDisabled(opt));
             if(available.length <= 1) return;
             evt.preventDefault();
-            const currentBtn = toggle.querySelector('.mode-option.active');
+            const currentBtn = available.find(opt=>opt.classList.contains('active')) || available[0];
             const currentIndex = available.indexOf(currentBtn);
-            const baseIndex = currentIndex >= 0 ? currentIndex : 0;
             const delta = evt.key === 'ArrowLeft' ? -1 : 1;
-            const nextIndex = ((baseIndex + delta) % available.length + available.length) % available.length;
+            const nextIndex = ((currentIndex + delta) % available.length + available.length) % available.length;
             const next = available[nextIndex];
             if(next){
               activate(next.dataset.mode, {focus:true});
@@ -952,7 +1002,9 @@
         activate(initial);
       }
       positionToggleThumb(toggle);
-      window.addEventListener('resize', ()=> positionToggleThumb(toggle));
+      const handleResize = ()=> positionToggleThumb(toggle);
+      window.addEventListener('resize', handleResize);
+      toggle.__activateMode = (mode, opts)=> activate(mode, opts);
     }
 
     function updateTOC(){
