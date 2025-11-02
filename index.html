@@ -38,6 +38,8 @@
     box-shadow:0 2px 10px rgba(0,0,0,.04);position:relative;overflow:hidden;
   }
   .card.locked{opacity:.5}
+  .card.locked .video-wrap{pointer-events:none;}
+  .card.locked .video-wrap video{pointer-events:none;}
   .card .lock-banner{
     position:absolute;inset:0;background:repeating-linear-gradient(45deg,#00000010 0 12px,#00000008 12px 24px);
     display:flex;align-items:center;justify-content:center;font-weight:700;color:#374151;pointer-events:none;
@@ -45,10 +47,18 @@
   .card h2{margin:0 0 8px 0;font-size:20px}
   .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
     padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:#374151;background:#f9fafb}
-  .section-controls{display:flex;align-items:center;gap:12px;margin:10px 0 12px 0}
+  .section-controls{display:flex;align-items:center;gap:12px;margin:10px 0 12px 0;flex-wrap:wrap}
+  .mode-toggle{position:relative;display:flex;gap:4px;background:#e5e7eb;border-radius:999px;padding:4px;min-width:220px;}
+  .mode-toggle .mode-option{flex:1;border:0;background:transparent;color:#374151;font-weight:600;padding:6px 16px;border-radius:999px;cursor:pointer;position:relative;z-index:1;transition:color .2s ease;}
+  .mode-toggle .mode-option[aria-disabled="true"],
+  .mode-toggle .mode-option:disabled{cursor:not-allowed;color:var(--muted);}
+  .mode-toggle .mode-option.active{color:#fff;}
+  .mode-toggle .mode-thumb{position:absolute;top:4px;left:4px;height:calc(100% - 8px);border-radius:999px;background:#166534;transition:transform .25s ease,width .25s ease;z-index:0;}
+  .mode-toggle[data-options="1"]{justify-content:center;}
+  .mode-toggle[data-options="1"] .mode-thumb{display:none;}
+  .mode-toggle:focus-within{box-shadow:0 0 0 2px rgba(37,99,235,0.25);} 
   .video-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000;width:100%;}
   .video-wrap iframe,
-  .video-wrap #player2,
   .video-wrap video{width:100%;height:100%;border:0;display:block;}
   .video-16x9{aspect-ratio:16/9;}
   .muted{color:var(--muted)}
@@ -107,9 +117,12 @@
         <h2>Segment 1 — Passwords & Multi-Factor Authentication</h2>
         <div class="section-controls">
           <span class="pill">Mode</span>
-          <label><input type="radio" name="mode1" value="watch" checked> Watch</label>
-          <label><input type="radio" name="mode1" value="read"> Read or Listen</label>
-          <span id="modeNote1" class="small muted">Watch the video to completion, then take the quiz.</span>
+          <div class="mode-toggle" data-segment="1" data-initial="watch" data-options="2" role="radiogroup" aria-label="Segment 1 mode">
+            <span class="mode-thumb" aria-hidden="true"></span>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="watch">Watch</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="false" data-mode="read">Read or Listen</button>
+          </div>
+          <span id="modeNote1" class="small muted" data-note-watch="Watch the video (at least 90%) then take the quiz." data-note-read="Read the notes below, then take the quiz.">Watch the video (at least 90%) then take the quiz.</span>
         </div>
 
         <!-- Watch mode: local MP4 -->
@@ -118,8 +131,6 @@
             Sorry, your browser doesn't support embedded videos.
           </video>
         </div>
-        <p class="small muted" id="videoSource1">Video source: <span aria-hidden="true">Your Digital Security Upgrade</span></p>
-
         <div class="hr"></div>
         <div class="content-read" id="read1" style="display:none">
           <div class="audio-player" data-segment="1">
@@ -284,7 +295,7 @@
             </div>
           </fieldset>
           <div class="actions">
-            <button type="button" class="btn" onclick="submitQuiz(1)">Submit Quiz</button>
+            <button type="button" class="btn quiz-submit" data-segment="1" onclick="submitQuiz(1)">Submit Quiz</button>
             <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(1)">Reset Segment</button>
           </div>
           <div id="status1" class="status" aria-live="polite"></div>
@@ -297,19 +308,15 @@
         <h2>Segment 2 — Phishing & Suspicious Messages</h2>
         <div class="section-controls">
           <span class="pill">Mode</span>
-          <label><input type="radio" name="mode2" value="read"> Read or Listen</label>
-          <label><input type="radio" name="mode2" value="watch" checked> Watch</label>
-          <span id="modeNote2" class="small muted">If Watch is selected, you must finish the video.</span>
+          <div class="mode-toggle" data-segment="2" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 2 mode">
+            <span class="mode-thumb" aria-hidden="true"></span>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Read or Listen</button>
+          </div>
+          <span id="modeNote2" class="small muted" data-note-read="Read the notes below, then take the quiz.">Read the notes below, then take the quiz.</span>
         </div>
-
-        <!-- Watch mode: YouTube embed -->
-        <div class="video-wrap video-16x9" id="videoWrap2">
-          <div id="player2"></div>
-        </div>
-        <p class="small muted">Video source: <a href="https://www.youtube.com/watch?v=WNVTGTrWcvw" target="_blank" rel="noopener">Phishing video</a></p>
 
         <!-- Read mode content -->
-        <div class="content-read" id="read2" style="display:none">
+        <div class="content-read" id="read2">
           <p><strong>Red flags:</strong> unexpected password resets, urgent tone, strange sender, links that don’t match the display text, requests for sensitive info.</p>
           <ul>
             <li>Pause and verify via a known channel if something feels off.</li>
@@ -352,7 +359,7 @@
             </div>
           </fieldset>
           <div class="actions">
-            <button type="button" class="btn" onclick="submitQuiz(2)">Submit Quiz</button>
+            <button type="button" class="btn quiz-submit" data-segment="2" onclick="submitQuiz(2)">Submit Quiz</button>
             <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(2)">Reset Segment</button>
           </div>
           <div id="status2" class="status" aria-live="polite"></div>
@@ -365,9 +372,11 @@
         <h2>Segment 3 — Device Safety & Public Networks</h2>
         <div class="section-controls">
           <span class="pill">Mode</span>
-          <label><input type="radio" name="mode3" value="read" checked> Read or Listen</label>
-          <label class="muted"><input type="radio" name="mode3" value="watch" disabled> Watch (no video configured)</label>
-          <span id="modeNote3" class="small muted">Read the notes below, then take the quiz.</span>
+          <div class="mode-toggle" data-segment="3" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 3 mode">
+            <span class="mode-thumb" aria-hidden="true"></span>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Read or Listen</button>
+          </div>
+          <span id="modeNote3" class="small muted" data-note-read="Read the notes below, then take the quiz.">Read the notes below, then take the quiz.</span>
         </div>
         <div class="hr"></div>
         <div class="content-read" id="read3">
@@ -413,7 +422,7 @@
             </div>
           </fieldset>
           <div class="actions">
-            <button type="button" class="btn" onclick="submitQuiz(3)">Submit Quiz</button>
+            <button type="button" class="btn quiz-submit" data-segment="3" onclick="submitQuiz(3)">Submit Quiz</button>
             <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(3)">Reset Segment</button>
           </div>
           <div id="status3" class="status" aria-live="polite"></div>
@@ -426,9 +435,11 @@
         <h2>Segment 4 — Data Handling & Real-World Scenarios</h2>
         <div class="section-controls">
           <span class="pill">Mode</span>
-          <label><input type="radio" name="mode4" value="read" checked> Read or Listen</label>
-          <label class="muted"><input type="radio" name="mode4" value="watch" disabled> Watch (no video configured)</label>
-          <span id="modeNote4" class="small muted">Read the notes below, then take the quiz.</span>
+          <div class="mode-toggle" data-segment="4" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 4 mode">
+            <span class="mode-thumb" aria-hidden="true"></span>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Read or Listen</button>
+          </div>
+          <span id="modeNote4" class="small muted" data-note-read="Read the notes below, then take the quiz.">Read the notes below, then take the quiz.</span>
         </div>
         <div class="hr"></div>
         <div class="content-read" id="read4">
@@ -474,7 +485,7 @@
             </div>
           </fieldset>
           <div class="actions">
-            <button type="button" class="btn" onclick="submitQuiz(4)">Submit Quiz</button>
+            <button type="button" class="btn quiz-submit" data-segment="4" onclick="submitQuiz(4)">Submit Quiz</button>
             <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(4)">Reset Segment</button>
           </div>
           <div id="status4" class="status" aria-live="polite"></div>
@@ -495,8 +506,6 @@
     </div>
   </div>
 
-  <!-- YouTube IFrame API (for Segment 2 Watch mode) -->
-  <script src="https://www.youtube.com/iframe_api"></script>
   <!-- jsPDF for certificate -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-YkGJQ9r/6MPQx+ejwS3X0QW5vJk6d5lWfF0CwQh3g8i3xQq4F3u6y6bUQnqR2Wc1pM5s6s8nq7o6x0+fQW8KxA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -513,59 +522,33 @@
       // locked/ready
       locked: { 1:true, 2:true, 3:true, 4:true },
       // chosen modes
-      mode: { 1:'watch', 2:'watch', 3:'read', 4:'read' }
+      mode: { 1:'watch', 2:'read', 3:'read', 4:'read' }
     };
-
-    // YouTube player for segment 2
-    let player2;
-    function onYouTubeIframeAPIReady(){
-      // Segment 2: your phishing video
-      const playerConfig = {
-        videoId: 'WNVTGTrWcvw',
-        playerVars: { controls:1, rel:0, modestbranding:1, fs:0, playsinline:1 },
-        events: {
-          'onStateChange': (e)=>{
-            if(e.data === YT.PlayerState.ENDED){
-              state.videoDone[2] = true;
-              document.getElementById('status2').textContent = 'Video complete ✔ You may submit the quiz when ready.';
-              document.getElementById('status2').className = 'status ok';
-              updateTOC();
-            }
-          }
-        }
-      };
-      if(typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null'){
-        playerConfig.playerVars.origin = window.location.origin;
-      }
-      player2 = new YT.Player('player2', playerConfig);
-    }
 
     // --- Helpers ---
     const byId = (id)=>document.getElementById(id);
 
     const videoSegments = {
-      1: { type:'html', wrapId:'videoWrap1', videoId:'video1', sourceId:'videoSource1' },
-      2: { type:'youtube', wrapId:'videoWrap2' }
+      1: { type:'html', wrapId:'videoWrap1', videoId:'video1' }
     };
 
     const video1El = byId('video1');
     if(video1El){
       video1El.addEventListener('play', ()=>{
-        // Reset completion flag when replaying
-        state.videoDone[1] = false;
-        const st = byId('status1');
-        if(st && st.textContent.includes('Video complete')){
-          st.textContent = '';
-          st.className = 'status';
+        if(video1El.currentTime <= 0.1){
+          state.videoDone[1] = false;
+          clearVideoStatus(1);
+          updateQuizAvailability(1);
         }
       });
-      video1El.addEventListener('ended', ()=>{
-        state.videoDone[1] = true;
-        const st = byId('status1');
-        st.textContent = 'Video complete ✔ You may submit the quiz when ready.';
-        st.className = 'status ok';
-        updateTOC();
+      video1El.addEventListener('timeupdate', ()=> updateVideoProgress(1, video1El));
+      video1El.addEventListener('ended', ()=> updateVideoProgress(1, video1El));
+      video1El.addEventListener('seeked', ()=>{
+        if(video1El.paused){
+          updateVideoProgress(1, video1El);
+        }
       });
+      video1El.addEventListener('loadedmetadata', ()=> updateVideoProgress(1, video1El));
     }
 
     // Ensure jsPDF is available before trying to create a certificate.
@@ -741,45 +724,163 @@
       }
     });
 
-    function setMode(n, mode){
+    const VIDEO_COMPLETION_THRESHOLD = 0.9;
+
+    function clearVideoStatus(n){
+      const st = byId('status'+n);
+      if(st && st.dataset.videoComplete === 'true'){
+        st.textContent = '';
+        st.className = 'status';
+        delete st.dataset.videoComplete;
+      }
+    }
+
+    function applyMode(n, mode){
       state.mode[n] = mode;
       const note = byId('modeNote'+n);
       const readBlock = byId('read'+n);
       const videoConfig = videoSegments[n];
       const wrap = videoConfig ? byId(videoConfig.wrapId) : null;
-      const sourceNote = videoConfig?.sourceId ? byId(videoConfig.sourceId) : null;
-      const htmlVideo = (videoConfig?.type === 'html' && videoConfig.videoId) ? byId(videoConfig.videoId) : null;
-      if(mode === 'watch'){
-        if(videoConfig){
-          if(wrap) wrap.style.display = '';
-          if(sourceNote) sourceNote.style.display = '';
-          if(readBlock) readBlock.style.display = 'none';
-          if(note) note.textContent = 'Watch the video to completion, then pass the quiz (4/5).';
-        } else {
-          if(note) note.textContent = 'No video available for this segment; switched to Read mode.';
+      const htmlVideo = videoConfig?.videoId ? byId(videoConfig.videoId) : null;
+      if(mode === 'watch' && videoConfig){
+        if(wrap) wrap.style.display = '';
+        if(readBlock) readBlock.style.display = 'none';
+        if(note && note.dataset.noteWatch){
+          note.textContent = note.dataset.noteWatch;
         }
       } else {
-        if(videoConfig){
-          if(wrap) wrap.style.display = 'none';
-          if(sourceNote) sourceNote.style.display = 'none';
+        if(videoConfig && wrap){
+          wrap.style.display = 'none';
           if(htmlVideo){
             try {
               htmlVideo.pause();
-              htmlVideo.currentTime = 0;
             } catch(err){}
           }
         }
         if(readBlock) readBlock.style.display = '';
-        if(note) note.textContent = 'Read the notes below, then pass the quiz (4/5).';
+        if(note && note.dataset.noteRead){
+          note.textContent = note.dataset.noteRead;
+        }
       }
+      updateQuizAvailability(n);
+    }
 
-      // For segments without videos, force read
-      if(mode === 'watch' && !videoConfig){
-        // revert to read
-        const inputs = document.querySelectorAll(`input[name="mode${n}"]`);
-        inputs.forEach(i=>{ if(i.value==='read') i.checked = true; });
-        state.mode[n] = 'read';
+    function updateQuizAvailability(n){
+      const btn = document.querySelector(`.quiz-submit[data-segment="${n}"]`);
+      if(!btn) return;
+      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n];
+      btn.disabled = requiresVideo && !state.videoDone[n];
+    }
+
+    function computeWatchedPercent(video){
+      const duration = video?.duration || 0;
+      if(!Number.isFinite(duration) || duration <= 0) return 0;
+      let watched = 0;
+      const ranges = video.played;
+      for(let i=0;i<ranges.length;i++){
+        watched += ranges.end(i) - ranges.start(i);
       }
+      watched = Math.max(0, watched);
+      return Math.max(0, Math.min(1, watched / duration));
+    }
+
+    function updateVideoProgress(n, video){
+      const percent = computeWatchedPercent(video);
+      if(percent >= VIDEO_COMPLETION_THRESHOLD){
+        if(!state.videoDone[n]){
+          state.videoDone[n] = true;
+          const st = byId('status'+n);
+          if(st){
+            st.textContent = 'Video ready ✔ You may take the quiz when ready.';
+            st.className = 'status ok';
+            st.dataset.videoComplete = 'true';
+          }
+          updateTOC();
+          updateQuizAvailability(n);
+        }
+      } else if(state.videoDone[n]){
+        state.videoDone[n] = false;
+        clearVideoStatus(n);
+        updateQuizAvailability(n);
+      }
+    }
+
+    function positionToggleThumb(toggle){
+      const thumb = toggle.querySelector('.mode-thumb');
+      const active = toggle.querySelector('.mode-option.active');
+      if(!thumb || !active) return;
+      const toggleRect = toggle.getBoundingClientRect();
+      const activeRect = active.getBoundingClientRect();
+      const offset = activeRect.left - toggleRect.left;
+      thumb.style.width = `${activeRect.width}px`;
+      thumb.style.transform = `translateX(${offset}px)`;
+    }
+
+    function initModeToggle(toggle){
+      const segment = Number(toggle.dataset.segment);
+      const options = Array.from(toggle.querySelectorAll('.mode-option'));
+      toggle.dataset.options = String(options.length);
+
+      const activate = (mode, {focus} = {})=>{
+        const candidate = options.find(btn=>btn.dataset.mode === mode && !btn.disabled && btn.getAttribute('aria-disabled') !== 'true');
+        const enabledOptions = options.filter(btn=>!btn.disabled && btn.getAttribute('aria-disabled') !== 'true');
+        let target = candidate || enabledOptions[0];
+        if(!target) return;
+        mode = target.dataset.mode;
+        state.mode[segment] = mode;
+        toggle.dataset.active = mode;
+        options.forEach(btn=>{
+          const isActive = btn === target;
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-checked', isActive ? 'true' : 'false');
+          if(btn.disabled || btn.getAttribute('aria-disabled') === 'true'){
+            btn.tabIndex = -1;
+          } else {
+            btn.tabIndex = isActive ? 0 : -1;
+          }
+        });
+        applyMode(segment, mode);
+        requestAnimationFrame(()=> positionToggleThumb(toggle));
+        if(focus){ target.focus(); }
+      };
+
+      options.forEach(btn=>{
+        const disabled = btn.disabled || btn.getAttribute('aria-disabled') === 'true';
+        if(disabled){
+          btn.setAttribute('aria-disabled','true');
+          btn.tabIndex = -1;
+          return;
+        }
+        btn.addEventListener('click', ()=> activate(btn.dataset.mode, {focus:true}));
+        btn.addEventListener('keydown', evt=>{
+          if(evt.key === ' ' || evt.key === 'Enter'){
+            evt.preventDefault();
+            activate(btn.dataset.mode, {focus:true});
+            return;
+          }
+          if(evt.key === 'ArrowLeft' || evt.key === 'ArrowRight'){
+            const available = options.filter(opt=>!opt.disabled && opt.getAttribute('aria-disabled') !== 'true');
+            if(available.length <= 1) return;
+            evt.preventDefault();
+            const currentBtn = toggle.querySelector('.mode-option.active');
+            const currentIndex = available.indexOf(currentBtn);
+            const baseIndex = currentIndex >= 0 ? currentIndex : 0;
+            const delta = evt.key === 'ArrowLeft' ? -1 : 1;
+            const nextIndex = ((baseIndex + delta) % available.length + available.length) % available.length;
+            const next = available[nextIndex];
+            if(next){
+              activate(next.dataset.mode, {focus:true});
+            }
+          }
+        });
+      });
+
+      const initial = toggle.dataset.initial || options.find(btn=>btn.classList.contains('active'))?.dataset.mode || options[0]?.dataset.mode;
+      if(initial){
+        activate(initial);
+      }
+      positionToggleThumb(toggle);
+      window.addEventListener('resize', ()=> positionToggleThumb(toggle));
     }
 
     function updateTOC(){
@@ -814,16 +915,7 @@
     lockSeg(1,true); lockSeg(2,true); lockSeg(3,true); lockSeg(4,true);
     toggleCertLock(true);
 
-    // Mode radio handlers
-    for(let n of [1,2,3,4]){
-      const radios = document.querySelectorAll(`input[name="mode${n}"]`);
-      radios.forEach(r=>{
-        r.addEventListener('change', ()=> setMode(n, r.value));
-      });
-      // set initial
-      const checked = Array.from(radios).find(r=>r.checked)?.value || 'read';
-      setMode(n, checked);
-    }
+    document.querySelectorAll('.mode-toggle').forEach(initModeToggle);
 
     // Quiz answer keys
     const keys = {
@@ -838,7 +930,7 @@
       if(state.mode[n] === 'watch'){
         if(!state.videoDone[n]){
           const st = byId('status'+n);
-          st.textContent = 'Please finish the video before submitting the quiz.';
+          st.textContent = 'Please watch at least 90% of the video before submitting the quiz.';
           st.className = 'status warn';
           return;
         }
@@ -885,13 +977,12 @@
       state.videoDone[n] = false;
       state.quizScore[n] = null;
       state.complete[n] = false;
+      clearVideoStatus(n);
+      updateQuizAvailability(n);
 
       // If segment had a player and was at end, seek to 0
       if(n===1 && video1El){
         try { video1El.pause(); video1El.currentTime = 0; } catch(e){}
-      }
-      if(n===2 && player2 && typeof player2.seekTo === 'function'){
-        try { player2.seekTo(0,true); player2.pauseVideo && player2.pauseVideo(); } catch(e){}
       }
       const audioEl = document.querySelector(`#seg${n} .audio-player audio`);
       if(audioEl){
