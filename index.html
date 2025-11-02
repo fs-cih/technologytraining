@@ -88,13 +88,19 @@
   .status.err{color:var(--danger)}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
   .intro .actions{margin-top:0;flex-direction:column;align-items:flex-start;gap:12px;}
+  .intro .form-fields{display:flex;flex-direction:column;gap:12px;max-width:420px;width:100%;}
+  .intro .form-fields label{font-weight:600;font-size:14px;color:#374151;}
+  .intro .form-fields input{margin-top:4px;}
   .toc{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
   .toc .progress-pill{display:flex;align-items:center;font-size:13px;font-weight:700;}
   .toc .seg{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);
     border-radius:10px;background:#fff;font-size:12px}
   .hr{height:1px;background:var(--border);margin:12px 0}
   .footer-card{grid-column:1/-1}
-  input[type="text"]{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;width:100%;max-width:360px}
+  input[type="text"],
+  input[type="email"],
+  input[type="password"]{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;width:100%;max-width:360px}
+  .btn-start:disabled{background:#fff;color:var(--muted);border:1px solid var(--border);box-shadow:none;}
 </style>
 </head>
 <body>
@@ -104,8 +110,19 @@
       <div class="intro-body">
         <h1>Cybersecurity Awareness Training</h1>
         <p class="lead">This short course has four segments. Choose to <strong>read</strong> or <strong>watch</strong> in each segment, then pass a 5-question quiz (score 4/5) to unlock the next segment. After all four are complete, enter your name to download a certificate.</p>
+        <div class="form-fields" id="startForm">
+          <label for="participantName">Name
+            <input id="participantName" type="text" placeholder="Your full name" autocomplete="name" required>
+          </label>
+          <label for="participantEmail">Email
+            <input id="participantEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+          </label>
+          <label for="participantPassword">Password
+            <input id="participantPassword" type="password" placeholder="Password123" autocomplete="new-password" required>
+          </label>
+        </div>
         <div class="actions">
-          <button id="startBtn" class="btn">Start Training</button>
+          <button id="startBtn" class="btn btn-start" disabled>Start Training</button>
         </div>
       </div>
       <div class="toc" id="toc">
@@ -501,8 +518,7 @@
       <section class="card footer-card locked" id="certCard" aria-disabled="true">
         <div class="lock-banner">Locked — complete all 4 segments</div>
         <h2>Certificate of Completion</h2>
-        <p>Enter your full name exactly as you’d like it to appear on the certificate.</p>
-        <input id="learnerName" type="text" placeholder="Your full name" />
+        <p>Your certificate will use the name provided above. Update it there if needed before generating.</p>
         <div class="actions">
           <button class="btn" id="genCertBtn" onclick="generateCertificate()" disabled>Generate Certificate (PDF)</button>
           <span id="certStatus" class="status" aria-live="polite"></span>
@@ -532,6 +548,31 @@
 
     // --- Helpers ---
     const byId = (id)=>document.getElementById(id);
+    const REQUIRED_PASSWORD = 'Password123';
+    const startBtn = byId('startBtn');
+    const nameInput = byId('participantName');
+    const emailInput = byId('participantEmail');
+    const passwordInput = byId('participantPassword');
+
+    function validateStartForm(){
+      const name = (nameInput?.value || '').trim();
+      const email = (emailInput?.value || '').trim();
+      const password = passwordInput?.value || '';
+      const emailValid = /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
+      const passwordValid = password === REQUIRED_PASSWORD;
+      const ready = !!(name && emailValid && passwordValid);
+      if(startBtn){
+        startBtn.disabled = !ready;
+      }
+    }
+
+    [nameInput, emailInput, passwordInput].forEach(input=>{
+      if(input){
+        input.addEventListener('input', validateStartForm);
+      }
+    });
+
+    validateStartForm();
 
     const introEl = document.querySelector('.intro');
     if(introEl){
@@ -1028,12 +1069,15 @@
     }
 
     // Start button
-    byId('startBtn').addEventListener('click', ()=>{
-      if(state.started) return;
-      state.started = true;
-      lockSeg(1,false); // unlock segment 1
-      updateTOC();
-    });
+    if(startBtn){
+      startBtn.addEventListener('click', ()=>{
+        if(state.started) return;
+        state.started = true;
+        startBtn.disabled = true;
+        lockSeg(1,false); // unlock segment 1
+        updateTOC();
+      });
+    }
 
     // Initialize locks
     lockSeg(1,true); lockSeg(2,true); lockSeg(3,true); lockSeg(4,true);
@@ -1119,9 +1163,9 @@
 
     // Certificate
     async function generateCertificate(){
-      const name = (byId('learnerName').value || '').trim();
+      const name = (nameInput?.value || '').trim();
       if(!name){
-        byId('certStatus').textContent = 'Please enter your name.';
+        byId('certStatus').textContent = 'Please enter your name in the top form.';
         byId('certStatus').className = 'status warn';
         return;
       }
