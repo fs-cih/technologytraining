@@ -42,6 +42,10 @@
     background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;
     box-shadow:0 2px 10px rgba(0,0,0,.04);position:relative;overflow:hidden;
   }
+  .card[data-view="notes"] .quiz-block{display:none;}
+  .card[data-view="quiz"] .content-read{display:none;}
+  .card[data-view="quiz"] .return-to-quiz{display:none;}
+  .card .view-notes{display:none;margin-top:6px;}
   .card.locked{opacity:.5}
   .card.locked .video-wrap{pointer-events:none;}
   .card.locked .video-wrap video{pointer-events:none;}
@@ -54,7 +58,7 @@
     padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:#374151;background:#f9fafb}
   .section-controls{display:flex;align-items:center;gap:12px;margin:10px 0 12px 0;flex-wrap:wrap}
   .mode-toggle{position:relative;display:flex;gap:4px;background:#e5e7eb;border-radius:999px;padding:4px;min-width:260px;overflow:hidden;}
-  .mode-toggle .mode-option{flex:1;border:0;background:transparent;color:#374151;font-weight:600;padding:6px 16px;border-radius:999px;cursor:pointer;position:relative;z-index:1;transition:color .2s ease;white-space:nowrap;}
+  .mode-toggle .mode-option{flex:1 1 0;border:0;background:transparent;color:#374151;font-weight:600;padding:6px 16px;border-radius:999px;cursor:pointer;position:relative;z-index:1;transition:color .2s ease;white-space:nowrap;}
   .mode-toggle .mode-option[aria-disabled="true"],
   .mode-toggle .mode-option:disabled{cursor:not-allowed;color:var(--muted);}
   .mode-toggle .mode-option.active{color:#fff;}
@@ -88,6 +92,7 @@
   .status.err{color:var(--danger)}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
   .intro .actions{margin-top:0;flex-direction:column;align-items:flex-start;gap:12px;}
+  .return-to-quiz{margin-top:16px;}
   .toc{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
   .toc .progress-pill{display:flex;align-items:center;font-size:13px;font-weight:700;}
   .toc .seg{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);
@@ -162,16 +167,16 @@
     <div class="row" id="segments">
 
       <!-- Segment 1 -->
-      <section class="card locked" id="seg1" aria-disabled="true">
+      <section class="card locked" id="seg1" data-view="quiz" aria-disabled="true">
         <div class="lock-banner">Locked — complete the start form to begin</div>
         <h2>Segment 1 — Passwords & Multi-Factor Authentication</h2>
         <div class="section-controls">
           <div class="mode-toggle" data-segment="1" data-initial="watch" data-options="2" role="radiogroup" aria-label="Segment 1 format">
             <span class="mode-thumb" aria-hidden="true"></span>
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="watch">Watch</button>
-            <button type="button" class="mode-option" role="radio" aria-checked="false" data-mode="read">Read or Listen</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="false" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote1" class="small muted" data-note-watch="Watch the video (at least 90%) then take the quiz." data-note-read="Read the notes below, then take the quiz.">Watch the video (at least 90%) then take the quiz.</span>
+          <span id="modeNote1" class="small muted" data-note-watch="Watch the video (at least 90%) then take the quiz." data-note-read="Review the video notes below, then take the quiz.">Watch the video (at least 90%) then take the quiz.</span>
         </div>
 
         <!-- Watch mode: local MP4 -->
@@ -181,7 +186,7 @@
           </video>
         </div>
         <div class="hr"></div>
-        <div class="content-read" id="read1" style="display:none">
+        <div class="content-read" id="read1">
           <div class="audio-player" data-segment="1">
             <button type="button" class="audio-toggle" aria-label="Play audio narration for Passwords and Multi-Factor Authentication" data-play-label="Play audio narration for Passwords and Multi-Factor Authentication" data-pause-label="Pause audio narration for Passwords and Multi-Factor Authentication">
               <span class="audio-icon" aria-hidden="true">▶</span>
@@ -309,9 +314,10 @@
               <p>These steps significantly reduce the chances of someone accessing your account without permission.</p>
             </section>
           </article>
+          <button type="button" class="btn return-to-quiz" data-segment="1">Return to Quiz</button>
         </div>
 
-        <form id="quiz1">
+        <form id="quiz1" class="quiz-block">
           <fieldset>
             <div class="q">
               <p>1) Which is the best example of a strong passphrase?</p>
@@ -347,20 +353,21 @@
             <button type="button" class="btn quiz-submit" data-segment="1" onclick="submitQuiz(1)">Submit Quiz</button>
             <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(1)">Reset Segment</button>
           </div>
+          <button type="button" class="link-button view-notes" data-segment="1">Back to Video Notes</button>
           <div id="status1" class="status" aria-live="polite"></div>
         </form>
       </section>
 
       <!-- Segment 2 -->
-      <section class="card locked" id="seg2" aria-disabled="true">
+      <section class="card locked" id="seg2" data-view="notes" aria-disabled="true">
         <div class="lock-banner">Locked — complete Segment 1</div>
         <h2>Segment 2 — Phishing & Suspicious Messages</h2>
         <div class="section-controls">
           <div class="mode-toggle" data-segment="2" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 2 format">
             <span class="mode-thumb" aria-hidden="true"></span>
-            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Read or Listen</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote2" class="small muted" data-note-read="Read the notes below, then take the quiz.">Read the notes below, then take the quiz.</span>
+          <span id="modeNote2" class="small muted" data-note-read="Review the video notes below, then take the quiz.">Review the video notes below, then take the quiz.</span>
         </div>
 
         <!-- Read mode content -->
@@ -371,9 +378,10 @@
             <li>Hover or long-press links to preview where they go.</li>
             <li>Report suspicious messages to your IT/contact.</li>
           </ul>
+          <button type="button" class="btn return-to-quiz" data-segment="2">Return to Quiz</button>
         </div>
 
-        <form id="quiz2">
+        <form id="quiz2" class="quiz-block">
           <fieldset>
             <div class="q">
               <p>1) Which is a phishing red flag?</p>
@@ -410,20 +418,21 @@
             <button type="button" class="btn quiz-submit" data-segment="2" onclick="submitQuiz(2)">Submit Quiz</button>
             <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(2)">Reset Segment</button>
           </div>
+          <button type="button" class="link-button view-notes" data-segment="2">Back to Video Notes</button>
           <div id="status2" class="status" aria-live="polite"></div>
         </form>
       </section>
 
       <!-- Segment 3 -->
-      <section class="card locked" id="seg3" aria-disabled="true">
+      <section class="card locked" id="seg3" data-view="notes" aria-disabled="true">
         <div class="lock-banner">Locked — complete Segment 2</div>
         <h2>Segment 3 — Device Safety & Public Networks</h2>
         <div class="section-controls">
           <div class="mode-toggle" data-segment="3" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 3 format">
             <span class="mode-thumb" aria-hidden="true"></span>
-            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Read or Listen</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote3" class="small muted" data-note-read="Read the notes below, then take the quiz.">Read the notes below, then take the quiz.</span>
+          <span id="modeNote3" class="small muted" data-note-read="Review the video notes below, then take the quiz.">Review the video notes below, then take the quiz.</span>
         </div>
         <div class="hr"></div>
         <div class="content-read" id="read3">
@@ -433,9 +442,10 @@
             <li>Automatic updates patch known vulnerabilities.</li>
             <li>Lock your screen when you step away.</li>
           </ul>
+          <button type="button" class="btn return-to-quiz" data-segment="3">Return to Quiz</button>
         </div>
 
-        <form id="quiz3">
+        <form id="quiz3" class="quiz-block">
           <fieldset>
             <div class="q">
               <p>1) Why are open public Wi-Fi networks risky?</p>
@@ -472,20 +482,21 @@
             <button type="button" class="btn quiz-submit" data-segment="3" onclick="submitQuiz(3)">Submit Quiz</button>
             <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(3)">Reset Segment</button>
           </div>
+          <button type="button" class="link-button view-notes" data-segment="3">Back to Video Notes</button>
           <div id="status3" class="status" aria-live="polite"></div>
         </form>
       </section>
 
       <!-- Segment 4 -->
-      <section class="card locked" id="seg4" aria-disabled="true">
+      <section class="card locked" id="seg4" data-view="notes" aria-disabled="true">
         <div class="lock-banner">Locked — complete Segment 3</div>
         <h2>Segment 4 — Data Handling & Real-World Scenarios</h2>
         <div class="section-controls">
           <div class="mode-toggle" data-segment="4" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 4 format">
             <span class="mode-thumb" aria-hidden="true"></span>
-            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Read or Listen</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote4" class="small muted" data-note-read="Read the notes below, then take the quiz.">Read the notes below, then take the quiz.</span>
+          <span id="modeNote4" class="small muted" data-note-read="Review the video notes below, then take the quiz.">Review the video notes below, then take the quiz.</span>
         </div>
         <div class="hr"></div>
         <div class="content-read" id="read4">
@@ -495,9 +506,10 @@
             <li>Confirm requests via a known contact method.</li>
             <li>When in doubt, stop and ask.</li>
           </ul>
+          <button type="button" class="btn return-to-quiz" data-segment="4">Return to Quiz</button>
         </div>
 
-        <form id="quiz4">
+        <form id="quiz4" class="quiz-block">
           <fieldset>
             <div class="q">
               <p>1) Before sharing sensitive information you should…</p>
@@ -534,6 +546,7 @@
             <button type="button" class="btn quiz-submit" data-segment="4" onclick="submitQuiz(4)">Submit Quiz</button>
             <button type="button" class="btn" style="background:#6b7280" onclick="resetSegment(4)">Reset Segment</button>
           </div>
+          <button type="button" class="link-button view-notes" data-segment="4">Back to Video Notes</button>
           <div id="status4" class="status" aria-live="polite"></div>
         </form>
       </section>
@@ -567,7 +580,11 @@
       // locked/ready
       locked: { 1:true, 2:true, 3:true, 4:true },
       // chosen modes
-      mode: { 1:'watch', 2:'read', 3:'read', 4:'read' }
+      mode: { 1:'watch', 2:'read', 3:'read', 4:'read' },
+      // current view (quiz or notes)
+      view: { 1:'quiz', 2:'notes', 3:'notes', 4:'notes' },
+      // bypass flags for video requirement
+      videoBypass: { 1:false, 2:false, 3:false, 4:false }
     };
 
     // --- Helpers ---
@@ -579,6 +596,7 @@
     const passwordInput = byId('participantPassword');
     const startOverlay = byId('startOverlay');
     const editDetailsBtn = byId('editDetailsBtn');
+    const togglesBySegment = {};
 
     function showStartOverlay(){
       if(!startOverlay) return;
@@ -876,40 +894,134 @@
       }
     }
 
-    function applyMode(n, mode){
-      state.mode[n] = mode;
-      const note = byId('modeNote'+n);
+    function setCardView(n, view){
+      state.view[n] = view;
+      const card = byId('seg'+n);
+      if(card){
+        card.dataset.view = view;
+      }
       const readBlock = byId('read'+n);
+      if(readBlock){
+        readBlock.style.display = view === 'notes' ? '' : 'none';
+      }
+      const quizBlock = card?.querySelector('.quiz-block');
+      if(quizBlock){
+        quizBlock.style.display = view === 'quiz' ? '' : 'none';
+      }
+      const returnBtn = card?.querySelector('.return-to-quiz');
+      if(returnBtn){
+        returnBtn.style.display = view === 'notes' ? '' : 'none';
+      }
+      const backBtn = card?.querySelector('.view-notes');
+      if(backBtn){
+        const toggle = togglesBySegment[n];
+        const hasWatch = !!toggle?.querySelector('.mode-option[data-mode="watch"]');
+        backBtn.style.display = view === 'quiz' && !hasWatch ? '' : 'none';
+      }
       const videoConfig = videoSegments[n];
-      const wrap = videoConfig ? byId(videoConfig.wrapId) : null;
-      const htmlVideo = videoConfig?.videoId ? byId(videoConfig.videoId) : null;
-      if(mode === 'watch' && videoConfig){
-        if(wrap) wrap.style.display = '';
-        if(readBlock) readBlock.style.display = 'none';
-        if(note && note.dataset.noteWatch){
-          note.textContent = note.dataset.noteWatch;
-        }
-      } else {
-        if(videoConfig && wrap){
-          wrap.style.display = 'none';
-          if(htmlVideo){
-            try {
-              htmlVideo.pause();
-            } catch(err){}
+      if(videoConfig){
+        const wrap = byId(videoConfig.wrapId);
+        const htmlVideo = videoConfig.videoId ? byId(videoConfig.videoId) : null;
+        if(wrap){
+          if(view === 'quiz' && state.mode[n] === 'watch'){
+            wrap.style.display = '';
+          } else {
+            wrap.style.display = 'none';
+            if(htmlVideo){
+              try {
+                htmlVideo.pause();
+              } catch(err){}
+            }
           }
-        }
-        if(readBlock) readBlock.style.display = '';
-        if(note && note.dataset.noteRead){
-          note.textContent = note.dataset.noteRead;
         }
       }
       updateQuizAvailability(n);
     }
 
+    function triggerMode(segment, mode, focus=false){
+      const toggle = togglesBySegment[segment];
+      if(toggle && typeof toggle.__activateMode === 'function'){
+        toggle.__activateMode(mode, { focus });
+        return true;
+      }
+      state.mode[segment] = mode;
+      if(mode === 'watch'){
+        setCardView(segment, 'quiz');
+      } else if(mode === 'read'){
+        setCardView(segment, 'notes');
+      }
+      return false;
+    }
+
+    function handleReturnToQuizClick(evt){
+      const segment = Number(evt.currentTarget.dataset.segment);
+      if(!segment) return;
+      const toggle = togglesBySegment[segment];
+      const hasWatchOption = !!toggle?.querySelector('.mode-option[data-mode="watch"]');
+      if(hasWatchOption){
+        triggerMode(segment, 'watch', false);
+      } else {
+        setCardView(segment, 'quiz');
+      }
+      if(videoSegments[segment]){
+        state.videoBypass[segment] = true;
+        const st = byId('status'+segment);
+        if(st && !state.complete[segment]){
+          st.textContent = 'Quiz unlocked ✔ You may submit when ready.';
+          st.className = 'status ok';
+          st.dataset.videoComplete = 'true';
+        }
+      }
+      if(!hasWatchOption){
+        updateQuizAvailability(segment);
+      }
+      const quizBlock = byId('seg'+segment)?.querySelector('.quiz-block');
+      quizBlock?.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    function handleBackToNotesClick(evt){
+      const segment = Number(evt.currentTarget.dataset.segment);
+      if(!segment) return;
+      const handled = triggerMode(segment, 'read', false);
+      if(!handled){
+        setCardView(segment, 'notes');
+      }
+      const notesBlock = byId('read'+segment);
+      notesBlock?.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    function applyMode(n, mode){
+      state.mode[n] = mode;
+      const note = byId('modeNote'+n);
+      const videoConfig = videoSegments[n];
+      const htmlVideo = videoConfig?.videoId ? byId(videoConfig.videoId) : null;
+      if(mode === 'watch' && videoConfig){
+        if(note && note.dataset.noteWatch){
+          note.textContent = note.dataset.noteWatch;
+        }
+        setCardView(n, 'quiz');
+      } else {
+        setCardView(n, 'notes');
+        if(note && note.dataset.noteRead){
+          note.textContent = note.dataset.noteRead;
+        }
+        if(videoConfig && htmlVideo){
+          try {
+            htmlVideo.pause();
+          } catch(err){}
+        }
+      }
+    }
+
     function updateQuizAvailability(n){
       const btn = document.querySelector(`.quiz-submit[data-segment="${n}"]`);
       if(!btn) return;
-      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n];
+      const view = state.view[n] || 'notes';
+      if(view !== 'quiz'){
+        btn.disabled = true;
+        return;
+      }
+      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n] && !state.videoBypass[n];
       btn.disabled = requiresVideo && !state.videoDone[n];
     }
 
@@ -962,6 +1074,7 @@
       const segment = Number(toggle.dataset.segment);
       const options = Array.from(toggle.querySelectorAll('.mode-option'));
       toggle.dataset.options = String(options.length);
+      togglesBySegment[segment] = toggle;
       const isDisabled = (btn)=> btn.disabled || btn.getAttribute('aria-disabled') === 'true';
 
       const activate = (mode, {focus} = {})=>{
@@ -1069,6 +1182,12 @@
     toggleCertLock(true);
 
     document.querySelectorAll('.mode-toggle').forEach(initModeToggle);
+    document.querySelectorAll('.return-to-quiz').forEach(btn=>{
+      btn.addEventListener('click', handleReturnToQuizClick);
+    });
+    document.querySelectorAll('.view-notes').forEach(btn=>{
+      btn.addEventListener('click', handleBackToNotesClick);
+    });
 
     // Quiz answer keys
     const keys = {
@@ -1130,8 +1249,9 @@
       state.videoDone[n] = false;
       state.quizScore[n] = null;
       state.complete[n] = false;
+      state.videoBypass[n] = false;
       clearVideoStatus(n);
-      updateQuizAvailability(n);
+      setCardView(n, state.mode[n] === 'watch' ? 'quiz' : 'notes');
 
       // If segment had a player and was at end, seek to 0
       if(n===1 && video1El){
