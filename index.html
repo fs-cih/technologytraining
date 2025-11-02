@@ -53,8 +53,8 @@
   .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
     padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:#374151;background:#f9fafb}
   .section-controls{display:flex;align-items:center;gap:12px;margin:10px 0 12px 0;flex-wrap:wrap}
-  .mode-toggle{position:relative;display:flex;gap:4px;background:#e5e7eb;border-radius:999px;padding:4px;min-width:220px;}
-  .mode-toggle .mode-option{flex:1;border:0;background:transparent;color:#374151;font-weight:600;padding:6px 16px;border-radius:999px;cursor:pointer;position:relative;z-index:1;transition:color .2s ease;}
+  .mode-toggle{position:relative;display:flex;gap:4px;background:#e5e7eb;border-radius:999px;padding:4px;min-width:260px;}
+  .mode-toggle .mode-option{flex:1;border:0;background:transparent;color:#374151;font-weight:600;padding:6px 16px;border-radius:999px;cursor:pointer;position:relative;z-index:1;transition:color .2s ease;white-space:nowrap;}
   .mode-toggle .mode-option[aria-disabled="true"],
   .mode-toggle .mode-option:disabled{cursor:not-allowed;color:var(--muted);}
   .mode-toggle .mode-option.active{color:#fff;}
@@ -535,13 +535,41 @@
 
     const introEl = document.querySelector('.intro');
     if(introEl){
-      const toggleIntroCompact = ()=>{
-        const shouldCompact = window.scrollY > 80;
-        introEl.classList.toggle('compact', shouldCompact);
+      const COMPACT_SCROLL_ON = 120;
+      const COMPACT_SCROLL_OFF = 40;
+      let isCompact = introEl.classList.contains('compact');
+
+      const setCompact = (value)=>{
+        if(value !== isCompact){
+          isCompact = value;
+          introEl.classList.toggle('compact', isCompact);
+        }
       };
-      toggleIntroCompact();
-      window.addEventListener('scroll', toggleIntroCompact, { passive:true });
-      window.addEventListener('resize', toggleIntroCompact);
+
+      const evaluateCompact = ()=>{
+        const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+        if(isCompact){
+          if(scrollY <= COMPACT_SCROLL_OFF){
+            setCompact(false);
+          }
+        } else if(scrollY >= COMPACT_SCROLL_ON){
+          setCompact(true);
+        }
+      };
+
+      let rafScheduled = false;
+      const requestEvaluate = ()=>{
+        if(rafScheduled) return;
+        rafScheduled = true;
+        requestAnimationFrame(()=>{
+          rafScheduled = false;
+          evaluateCompact();
+        });
+      };
+
+      evaluateCompact();
+      window.addEventListener('scroll', requestEvaluate, { passive:true });
+      window.addEventListener('resize', requestEvaluate);
     }
 
     const videoSegments = {
@@ -601,20 +629,37 @@
       }
       return ensureJsPdfPromise;
     }
+    function setLockedControlState(control, locked){
+      if(locked){
+        if(control.dataset.lockState) return;
+        control.dataset.lockState = '1';
+        control.dataset.lockPrevDisabled = control.disabled ? '1' : '0';
+        control.dataset.lockPrevAriaDisabled = control.hasAttribute('aria-disabled') ? control.getAttribute('aria-disabled') : '';
+        control.disabled = true;
+        control.setAttribute('aria-disabled','true');
+      } else if(control.dataset.lockState){
+        const wasDisabled = control.dataset.lockPrevDisabled === '1';
+        const prevAria = control.dataset.lockPrevAriaDisabled || '';
+        control.disabled = wasDisabled;
+        if(prevAria){
+          control.setAttribute('aria-disabled', prevAria);
+        } else {
+          control.removeAttribute('aria-disabled');
+        }
+        delete control.dataset.lockPrevDisabled;
+        delete control.dataset.lockPrevAriaDisabled;
+        delete control.dataset.lockState;
+      }
+    }
+
     function lockSeg(n, locked){
       const el = byId('seg'+n);
       state.locked[n] = !!locked;
       if(locked){
         el.classList.add('locked');
         el.setAttribute('aria-disabled','true');
-        const actionButtons = el.querySelectorAll('.actions button');
-        actionButtons.forEach(btn=>{
-          if(!btn.dataset.lockGuard){
-            btn.dataset.lockGuard = 'true';
-          }
-          btn.disabled = true;
-          btn.setAttribute('aria-disabled','true');
-        });
+        const controls = el.querySelectorAll('button, input, select, textarea');
+        controls.forEach(ctrl=> setLockedControlState(ctrl, true));
         // show lock banner
         if(!el.querySelector('.lock-banner')){
           const b = document.createElement('div');
@@ -627,14 +672,8 @@
       } else {
         el.classList.remove('locked');
         el.removeAttribute('aria-disabled');
-        const actionButtons = el.querySelectorAll('.actions button');
-        actionButtons.forEach(btn=>{
-          if(btn.dataset.lockGuard){
-            delete btn.dataset.lockGuard;
-            btn.disabled = false;
-            btn.removeAttribute('aria-disabled');
-          }
-        });
+        const controls = el.querySelectorAll('button, input, select, textarea');
+        controls.forEach(ctrl=> setLockedControlState(ctrl, false));
         const banner = el.querySelector('.lock-banner');
         if(banner) banner.style.display = 'none';
         updateQuizAvailability(n);
