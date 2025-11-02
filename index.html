@@ -972,9 +972,7 @@
           st.dataset.videoComplete = 'true';
         }
       }
-      if(!hasWatchOption){
-        updateQuizAvailability(segment);
-      }
+      updateQuizAvailability(segment);
       const quizBlock = byId('seg'+segment)?.querySelector('.quiz-block');
       quizBlock?.scrollIntoView({ behavior:'smooth', block:'start' });
     }
