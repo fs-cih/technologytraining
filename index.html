@@ -176,7 +176,7 @@
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="watch">Watch</button>
             <button type="button" class="mode-option" role="radio" aria-checked="false" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote1" class="small muted" data-note-watch="Watch the video (at least 90%) then take the quiz." data-note-read="Review the video notes below, then take the quiz.">Watch the video (at least 90%) then take the quiz.</span>
+          <span id="modeNote1" class="small muted" data-note-watch="Watch the video (at least 90%) then take the quiz." data-note-read="These notes contain the information discussed in the video.">Watch the video (at least 90%) then take the quiz.</span>
         </div>
 
         <!-- Watch mode: local MP4 -->
@@ -367,7 +367,7 @@
             <span class="mode-thumb" aria-hidden="true"></span>
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote2" class="small muted" data-note-read="Review the video notes below, then take the quiz.">Review the video notes below, then take the quiz.</span>
+          <span id="modeNote2" class="small muted" data-note-read="These notes contain the information discussed in the video.">These notes contain the information discussed in the video.</span>
         </div>
 
         <!-- Read mode content -->
@@ -432,7 +432,7 @@
             <span class="mode-thumb" aria-hidden="true"></span>
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote3" class="small muted" data-note-read="Review the video notes below, then take the quiz.">Review the video notes below, then take the quiz.</span>
+          <span id="modeNote3" class="small muted" data-note-read="These notes contain the information discussed in the video.">These notes contain the information discussed in the video.</span>
         </div>
         <div class="hr"></div>
         <div class="content-read" id="read3">
@@ -496,7 +496,7 @@
             <span class="mode-thumb" aria-hidden="true"></span>
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote4" class="small muted" data-note-read="Review the video notes below, then take the quiz.">Review the video notes below, then take the quiz.</span>
+          <span id="modeNote4" class="small muted" data-note-read="These notes contain the information discussed in the video.">These notes contain the information discussed in the video.</span>
         </div>
         <div class="hr"></div>
         <div class="content-read" id="read4">
@@ -967,8 +967,8 @@
         state.videoBypass[segment] = true;
         const st = byId('status'+segment);
         if(st && !state.complete[segment]){
-          st.textContent = 'Quiz unlocked ✔ You may submit when ready.';
-          st.className = 'status ok';
+          st.textContent = '';
+          st.className = 'status';
           st.dataset.videoComplete = 'true';
         }
       }
@@ -1062,10 +1062,9 @@
       const thumb = toggle.querySelector('.mode-thumb');
       const active = activeBtn || toggle.querySelector('.mode-option.active') || toggle.querySelector('.mode-option[aria-checked="true"]');
       if(!thumb || !active) return;
-      const toggleRect = toggle.getBoundingClientRect();
-      const activeRect = active.getBoundingClientRect();
-      const offset = activeRect.left - toggleRect.left;
-      thumb.style.width = `${activeRect.width}px`;
+      const baseLeft = parseFloat(window.getComputedStyle(thumb).left || '0') || 0;
+      const offset = active.offsetLeft - baseLeft;
+      thumb.style.width = `${active.offsetWidth}px`;
       thumb.style.transform = `translateX(${offset}px)`;
       thumb.style.opacity = '1';
     }
