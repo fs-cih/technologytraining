@@ -98,7 +98,7 @@
   input[type="email"],
   input[type="password"]{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;width:100%;max-width:360px}
   .btn-start:disabled{background:#fff;color:var(--muted);border:1px solid var(--border);box-shadow:none;}
-  .link-button{background:none;border:0;padding:0;font-size:14px;color:var(--primary);cursor:pointer;font-weight:600;text-decoration:underline;align-self:flex-start;}
+  .link-button{background:none;border:0;padding:0;font-size:16px;color:var(--primary);cursor:pointer;font-weight:400;text-decoration:underline;align-self:flex-start;}
   .link-button:hover{color:var(--primary-700);}
   body.overlay-active{overflow:hidden;}
   .start-overlay{
@@ -147,14 +147,14 @@
       <div class="intro-body">
         <h2 style="margin:0;font-size:24px;line-height:1.2;">Cybersecurity Awareness Training Overview</h2>
         <p class="lead">This short course has four segments. Choose to <strong>read</strong> or <strong>watch</strong> in each segment, then pass a 5-question quiz (score 4/5) to unlock the next segment. When you finish all four segments, generate your certificate using the name you entered to begin.</p>
-        <button type="button" class="link-button" id="editDetailsBtn">Update registration details</button>
+        <button type="button" class="link-button" id="editDetailsBtn">Update name or email address</button>
       </div>
       <div class="toc" id="toc">
         <span id="overallProgress" class="pill progress-pill" aria-live="polite">Progress: 0 / 4 complete</span>
-        <div class="seg" id="toc-s1">◻︎ Segment 1</div>
-        <div class="seg" id="toc-s2">◻︎ Segment 2</div>
-        <div class="seg" id="toc-s3">◻︎ Segment 3</div>
-        <div class="seg" id="toc-s4">◻︎ Segment 4</div>
+        <div class="seg" id="toc-s1">🔴 Segment 1</div>
+        <div class="seg" id="toc-s2">🔴 Segment 2</div>
+        <div class="seg" id="toc-s3">🔴 Segment 3</div>
+        <div class="seg" id="toc-s4">🔴 Segment 4</div>
       </div>
     </div>
 
@@ -1035,12 +1035,12 @@
       for(let i=1;i<=4;i++){
         const el = byId('toc-s'+i);
         if(state.complete[i]){
-          el.textContent = '✅ Segment ' + i;
+          el.textContent = '🟢 Segment ' + i;
           doneCount++;
         } else if(!state.locked[i]){
-          el.textContent = '⏳ Segment ' + i;
+          el.textContent = '🟡 Segment ' + i;
         } else {
-          el.textContent = '◻︎ Segment ' + i;
+          el.textContent = '🔴 Segment ' + i;
         }
       }
       byId('overallProgress').textContent = `Progress: ${doneCount} / 4 complete`;
