@@ -21,13 +21,10 @@
   .container{max-width:950px;margin:0 auto;padding:24px;}
   .intro{
     background:var(--card);border:1px solid var(--border);border-radius:14px;
-    padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.04);position:sticky;top:0;z-index:5;
-    display:flex;flex-direction:column;gap:16px;transition:padding .08s ease, box-shadow .08s ease;
+    padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.04);position:sticky;top:0;z-index:4;
+    display:flex;flex-direction:column;gap:16px;
   }
   .intro-body{display:flex;flex-direction:column;gap:12px;}
-  .intro.compact{padding:14px 18px;box-shadow:0 2px 6px rgba(0,0,0,.08);}
-  .intro.compact .intro-body{display:none;}
-  .intro.compact .toc{margin-top:0;}
   h1{margin:0 0 8px 0;font-size:28px;line-height:1.2;}
   p.lead{margin:0 0 12px 0;color:#374151}
   .small{font-size:14px;color:#4b5563}
@@ -88,43 +85,65 @@
   .status.err{color:var(--danger)}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
   .intro .actions{margin-top:0;flex-direction:column;align-items:flex-start;gap:12px;}
-  .intro .form-fields{display:flex;flex-direction:column;gap:12px;max-width:420px;width:100%;}
-  .intro .form-fields label{font-weight:600;font-size:14px;color:#374151;}
-  .intro .form-fields input{margin-top:4px;}
   .toc{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
   .toc .progress-pill{display:flex;align-items:center;font-size:13px;font-weight:700;}
   .toc .seg{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);
     border-radius:10px;background:#fff;font-size:12px}
-  .intro-sentinel{height:1px;margin-top:-1px;}
   .hr{height:1px;background:var(--border);margin:12px 0}
   .footer-card{grid-column:1/-1}
   input[type="text"],
   input[type="email"],
   input[type="password"]{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;width:100%;max-width:360px}
   .btn-start:disabled{background:#fff;color:var(--muted);border:1px solid var(--border);box-shadow:none;}
+  .link-button{background:none;border:0;padding:0;font-size:14px;color:var(--primary);cursor:pointer;font-weight:600;text-decoration:underline;align-self:flex-start;}
+  .link-button:hover{color:var(--primary-700);}
+  body.overlay-active{overflow:hidden;}
+  .start-overlay{
+    position:fixed;inset:0;background:rgba(17,24,39,0.65);display:flex;align-items:center;justify-content:center;
+    z-index:10;padding:24px;transition:opacity .3s ease, visibility .3s ease;
+  }
+  .start-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+  .start-dialog{
+    background:var(--card);border-radius:18px;box-shadow:0 20px 50px rgba(15,23,42,0.35);
+    padding:28px;max-width:460px;width:100%;border:1px solid var(--border);display:flex;flex-direction:column;gap:18px;
+  }
+  .start-dialog h1{margin:0;font-size:30px;line-height:1.15;color:var(--text);}
+  .start-dialog p{margin:0;color:#4b5563;}
+  .start-dialog .form-fields{display:flex;flex-direction:column;gap:14px;}
+  .start-dialog label{font-weight:600;font-size:14px;color:#374151;}
+  .start-dialog input{margin-top:4px;}
+  .start-dialog .actions{margin:4px 0 0 0;}
 </style>
 </head>
 <body>
+  <div class="start-overlay" id="startOverlay" role="dialog" aria-modal="true" aria-labelledby="startTitle">
+    <div class="start-dialog">
+      <h1 id="startTitle">Annual Cybersecurity Training</h1>
+      <p>Enter your details to unlock the training content. Your certificate will use the name you provide.</p>
+      <div class="form-fields" id="startForm">
+        <label for="participantName">Name
+          <input id="participantName" type="text" placeholder="Your full name" autocomplete="name" required>
+        </label>
+        <label for="participantEmail">Email
+          <input id="participantEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+        </label>
+        <label for="participantPassword">Password
+          <input id="participantPassword" type="password" placeholder="Password123" autocomplete="new-password" required>
+        </label>
+      </div>
+      <div class="actions">
+        <button id="startBtn" class="btn btn-start" disabled>Start Training</button>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <!-- Intro (always visible) -->
     <div class="intro">
       <div class="intro-body">
-        <h1>Cybersecurity Awareness Training</h1>
-        <p class="lead">This short course has four segments. Choose to <strong>read</strong> or <strong>watch</strong> in each segment, then pass a 5-question quiz (score 4/5) to unlock the next segment. After all four are complete, enter your name to download a certificate.</p>
-        <div class="form-fields" id="startForm">
-          <label for="participantName">Name
-            <input id="participantName" type="text" placeholder="Your full name" autocomplete="name" required>
-          </label>
-          <label for="participantEmail">Email
-            <input id="participantEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
-          </label>
-          <label for="participantPassword">Password
-            <input id="participantPassword" type="password" placeholder="Password123" autocomplete="new-password" required>
-          </label>
-        </div>
-        <div class="actions">
-          <button id="startBtn" class="btn btn-start" disabled>Start Training</button>
-        </div>
+        <h2 style="margin:0;font-size:24px;line-height:1.2;">Cybersecurity Awareness Training Overview</h2>
+        <p class="lead">This short course has four segments. Choose to <strong>read</strong> or <strong>watch</strong> in each segment, then pass a 5-question quiz (score 4/5) to unlock the next segment. When you finish all four segments, generate your certificate using the name you entered to begin.</p>
+        <button type="button" class="link-button" id="editDetailsBtn">Update registration details</button>
       </div>
       <div class="toc" id="toc">
         <span id="overallProgress" class="pill progress-pill" aria-live="polite">Progress: 0 / 4 complete</span>
@@ -135,14 +154,12 @@
       </div>
     </div>
 
-    <div class="intro-sentinel" id="introSentinel" aria-hidden="true"></div>
-
     <!-- Segments grid -->
     <div class="row" id="segments">
 
       <!-- Segment 1 -->
       <section class="card locked" id="seg1" aria-disabled="true">
-        <div class="lock-banner">Locked — press <strong>Start</strong> above</div>
+        <div class="lock-banner">Locked — complete the start form to begin</div>
         <h2>Segment 1 — Passwords & Multi-Factor Authentication</h2>
         <div class="section-controls">
           <div class="mode-toggle" data-segment="1" data-initial="watch" data-options="2" role="radiogroup" aria-label="Segment 1 format">
@@ -521,7 +538,7 @@
       <section class="card footer-card locked" id="certCard" aria-disabled="true">
         <div class="lock-banner">Locked — complete all 4 segments</div>
         <h2>Certificate of Completion</h2>
-        <p>Your certificate will use the name provided above. Update it there if needed before generating.</p>
+        <p>Your certificate will use the name you entered when starting the training.</p>
         <div class="actions">
           <button class="btn" id="genCertBtn" onclick="generateCertificate()" disabled>Generate Certificate (PDF)</button>
           <span id="certStatus" class="status" aria-live="polite"></span>
@@ -556,6 +573,27 @@
     const nameInput = byId('participantName');
     const emailInput = byId('participantEmail');
     const passwordInput = byId('participantPassword');
+    const startOverlay = byId('startOverlay');
+    const editDetailsBtn = byId('editDetailsBtn');
+
+    function showStartOverlay(){
+      if(!startOverlay) return;
+      startOverlay.classList.remove('hidden');
+      startOverlay.setAttribute('aria-hidden','false');
+      document.body.classList.add('overlay-active');
+      if(startBtn){
+        startBtn.textContent = state.started ? 'Save & Close' : 'Start Training';
+      }
+      setTimeout(()=> nameInput?.focus(), 60);
+    }
+
+    function hideStartOverlay(){
+      if(!startOverlay) return;
+      startOverlay.classList.add('hidden');
+      startOverlay.setAttribute('aria-hidden','true');
+      document.body.classList.remove('overlay-active');
+      setTimeout(()=> editDetailsBtn?.focus(), 60);
+    }
 
     function validateStartForm(){
       const name = (nameInput?.value || '').trim();
@@ -572,70 +610,27 @@
     [nameInput, emailInput, passwordInput].forEach(input=>{
       if(input){
         input.addEventListener('input', validateStartForm);
+        input.addEventListener('keydown', evt=>{
+          if(evt.key === 'Enter'){
+            evt.preventDefault();
+            if(startBtn && !startBtn.disabled){
+              startBtn.click();
+            }
+          }
+        });
       }
     });
 
     validateStartForm();
+    if(!state.started){
+      showStartOverlay();
+    }
 
-    let introCompactController = null;
-    const introEl = document.querySelector('.intro');
-    if(introEl){
-      const sentinel = document.getElementById('introSentinel');
-      let isCompact = introEl.classList.contains('compact');
-
-      const setCompact = (value)=>{
-        const next = !!value;
-        if(next !== isCompact){
-          isCompact = next;
-          introEl.classList.toggle('compact', next);
-        }
-      };
-
-      const computeShouldCompact = ()=>{
-        if(!state.started){
-          return false;
-        }
-        if(sentinel){
-          const rect = sentinel.getBoundingClientRect();
-          return rect.top <= 8;
-        }
-        const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-        return scrollY > 120;
-      };
-
-      const evaluateCompact = ()=>{
-        if(!state.started){
-          setCompact(false);
-          return;
-        }
-        setCompact(computeShouldCompact());
-      };
-
-      if('IntersectionObserver' in window && sentinel){
-        const observer = new IntersectionObserver((entries)=>{
-          if(!state.started){
-            setCompact(false);
-            return;
-          }
-          const entry = entries[0];
-          setCompact(!entry.isIntersecting);
-        }, { root:null, threshold:0, rootMargin:'-8px 0px 0px 0px' });
-        observer.observe(sentinel);
-        introCompactController = { evaluate:evaluateCompact, set:setCompact };
-      } else {
-        const handler = ()=>{
-          if(!state.started){
-            setCompact(false);
-            return;
-          }
-          setCompact(computeShouldCompact());
-        };
-        window.addEventListener('scroll', handler, { passive:true });
-        window.addEventListener('resize', handler);
-        introCompactController = { evaluate:evaluateCompact, set:setCompact };
-      }
-
-      evaluateCompact();
+    if(editDetailsBtn){
+      editDetailsBtn.addEventListener('click', ()=>{
+        showStartOverlay();
+        validateStartForm();
+      });
     }
 
     const videoSegments = {
@@ -1054,14 +1049,13 @@
     // Start button
     if(startBtn){
       startBtn.addEventListener('click', ()=>{
-        if(state.started) return;
-        state.started = true;
-        startBtn.disabled = true;
-        lockSeg(1,false); // unlock segment 1
-        updateTOC();
-        if(introCompactController){
-          introCompactController.evaluate();
+        if(!state.started){
+          state.started = true;
+          lockSeg(1,false); // unlock segment 1
+          updateTOC();
         }
+        hideStartOverlay();
+        validateStartForm();
       });
     }
 
