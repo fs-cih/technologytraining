@@ -95,6 +95,7 @@
   .toc .progress-pill{display:flex;align-items:center;font-size:13px;font-weight:700;}
   .toc .seg{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);
     border-radius:10px;background:#fff;font-size:12px}
+  .intro-sentinel{height:1px;margin-top:-1px;}
   .hr{height:1px;background:var(--border);margin:12px 0}
   .footer-card{grid-column:1/-1}
   input[type="text"],
@@ -133,6 +134,8 @@
         <div class="seg" id="toc-s4">◻︎ Segment 4</div>
       </div>
     </div>
+
+    <div class="intro-sentinel" id="introSentinel" aria-hidden="true"></div>
 
     <!-- Segments grid -->
     <div class="row" id="segments">
@@ -574,102 +577,65 @@
 
     validateStartForm();
 
-    let requestIntroCompactEvaluate = null;
-    let setIntroCompactState = null;
-    let introCompactScrollOn = 0;
-    let introCompactScrollOff = 0;
-
+    let introCompactController = null;
     const introEl = document.querySelector('.intro');
     if(introEl){
-      const COMPACT_SCROLL_ON = 120;
-      const COMPACT_SCROLL_OFF = 40;
+      const sentinel = document.getElementById('introSentinel');
       let isCompact = introEl.classList.contains('compact');
-      const COMPACT_DELAY_MS = 90;
-      let compactTimer = null;
-      let expandTimer = null;
-
-      const clearCompactTimer = ()=>{
-        if(compactTimer){
-          clearTimeout(compactTimer);
-          compactTimer = null;
-        }
-      };
-
-      const clearExpandTimer = ()=>{
-        if(expandTimer){
-          clearTimeout(expandTimer);
-          expandTimer = null;
-        }
-      };
 
       const setCompact = (value)=>{
-        if(value !== isCompact){
-          isCompact = value;
-          introEl.classList.toggle('compact', isCompact);
+        const next = !!value;
+        if(next !== isCompact){
+          isCompact = next;
+          introEl.classList.toggle('compact', next);
         }
-        if(value){
-          clearExpandTimer();
-        } else {
-          clearCompactTimer();
+      };
+
+      const computeShouldCompact = ()=>{
+        if(!state.started){
+          return false;
         }
+        if(sentinel){
+          const rect = sentinel.getBoundingClientRect();
+          return rect.top <= 8;
+        }
+        const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+        return scrollY > 120;
       };
 
       const evaluateCompact = ()=>{
         if(!state.started){
-          clearCompactTimer();
-          clearExpandTimer();
-          if(isCompact){
-            setCompact(false);
-          }
+          setCompact(false);
           return;
         }
-        const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-        if(isCompact){
-          if(scrollY <= COMPACT_SCROLL_OFF){
-            if(!expandTimer){
-              clearCompactTimer();
-              expandTimer = window.setTimeout(()=>{
-                setCompact(false);
-                expandTimer = null;
-              }, COMPACT_DELAY_MS);
-            }
-          } else {
-            clearExpandTimer();
-          }
-        } else if(scrollY >= COMPACT_SCROLL_ON){
-          if(!compactTimer){
-            clearExpandTimer();
-            compactTimer = window.setTimeout(()=>{
-              setCompact(true);
-              compactTimer = null;
-            }, COMPACT_DELAY_MS);
-          }
-        } else {
-          clearCompactTimer();
-        }
+        setCompact(computeShouldCompact());
       };
 
-      let rafScheduled = false;
-      const requestEvaluate = ()=>{
-        if(rafScheduled) return;
-        rafScheduled = true;
-        requestAnimationFrame(()=>{
-          rafScheduled = false;
-          evaluateCompact();
-        });
-      };
+      if('IntersectionObserver' in window && sentinel){
+        const observer = new IntersectionObserver((entries)=>{
+          if(!state.started){
+            setCompact(false);
+            return;
+          }
+          const entry = entries[0];
+          setCompact(!entry.isIntersecting);
+        }, { root:null, threshold:0, rootMargin:'-8px 0px 0px 0px' });
+        observer.observe(sentinel);
+        introCompactController = { evaluate:evaluateCompact, set:setCompact };
+      } else {
+        const handler = ()=>{
+          if(!state.started){
+            setCompact(false);
+            return;
+          }
+          setCompact(computeShouldCompact());
+        };
+        window.addEventListener('scroll', handler, { passive:true });
+        window.addEventListener('resize', handler);
+        introCompactController = { evaluate:evaluateCompact, set:setCompact };
+      }
 
       evaluateCompact();
-      const initialScroll = window.scrollY || document.documentElement.scrollTop || 0;
-      if(state.started && initialScroll >= COMPACT_SCROLL_ON){
-        setCompact(true);
-      }
-      introCompactScrollOn = COMPACT_SCROLL_ON;
-      introCompactScrollOff = COMPACT_SCROLL_OFF;
-      requestIntroCompactEvaluate = requestEvaluate;
-      setIntroCompactState = setCompact;
-      window.addEventListener('scroll', requestEvaluate, { passive:true });
-      window.addEventListener('resize', requestEvaluate);
     }
 
     const videoSegments = {
@@ -1093,16 +1059,8 @@
         startBtn.disabled = true;
         lockSeg(1,false); // unlock segment 1
         updateTOC();
-        if(setIntroCompactState){
-          const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-          if(scrollY >= introCompactScrollOn){
-            setIntroCompactState(true);
-          } else if(scrollY <= introCompactScrollOff){
-            setIntroCompactState(false);
-          }
-        }
-        if(requestIntroCompactEvaluate){
-          requestIntroCompactEvaluate();
+        if(introCompactController){
+          introCompactController.evaluate();
         }
       });
     }
