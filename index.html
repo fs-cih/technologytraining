@@ -125,8 +125,7 @@
         <div class="lock-banner">Locked — press <strong>Start</strong> above</div>
         <h2>Segment 1 — Passwords & Multi-Factor Authentication</h2>
         <div class="section-controls">
-          <span class="pill">Mode</span>
-          <div class="mode-toggle" data-segment="1" data-initial="watch" data-options="2" role="radiogroup" aria-label="Segment 1 mode">
+          <div class="mode-toggle" data-segment="1" data-initial="watch" data-options="2" role="radiogroup" aria-label="Segment 1 format">
             <span class="mode-thumb" aria-hidden="true"></span>
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="watch">Watch</button>
             <button type="button" class="mode-option" role="radio" aria-checked="false" data-mode="read">Read or Listen</button>
@@ -316,8 +315,7 @@
         <div class="lock-banner">Locked — complete Segment 1</div>
         <h2>Segment 2 — Phishing & Suspicious Messages</h2>
         <div class="section-controls">
-          <span class="pill">Mode</span>
-          <div class="mode-toggle" data-segment="2" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 2 mode">
+          <div class="mode-toggle" data-segment="2" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 2 format">
             <span class="mode-thumb" aria-hidden="true"></span>
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Read or Listen</button>
           </div>
@@ -380,8 +378,7 @@
         <div class="lock-banner">Locked — complete Segment 2</div>
         <h2>Segment 3 — Device Safety & Public Networks</h2>
         <div class="section-controls">
-          <span class="pill">Mode</span>
-          <div class="mode-toggle" data-segment="3" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 3 mode">
+          <div class="mode-toggle" data-segment="3" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 3 format">
             <span class="mode-thumb" aria-hidden="true"></span>
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Read or Listen</button>
           </div>
@@ -443,8 +440,7 @@
         <div class="lock-banner">Locked — complete Segment 3</div>
         <h2>Segment 4 — Data Handling & Real-World Scenarios</h2>
         <div class="section-controls">
-          <span class="pill">Mode</span>
-          <div class="mode-toggle" data-segment="4" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 4 mode">
+          <div class="mode-toggle" data-segment="4" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 4 format">
             <span class="mode-thumb" aria-hidden="true"></span>
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Read or Listen</button>
           </div>
@@ -611,6 +607,14 @@
       if(locked){
         el.classList.add('locked');
         el.setAttribute('aria-disabled','true');
+        const actionButtons = el.querySelectorAll('.actions button');
+        actionButtons.forEach(btn=>{
+          if(!btn.dataset.lockGuard){
+            btn.dataset.lockGuard = 'true';
+          }
+          btn.disabled = true;
+          btn.setAttribute('aria-disabled','true');
+        });
         // show lock banner
         if(!el.querySelector('.lock-banner')){
           const b = document.createElement('div');
@@ -623,8 +627,17 @@
       } else {
         el.classList.remove('locked');
         el.removeAttribute('aria-disabled');
+        const actionButtons = el.querySelectorAll('.actions button');
+        actionButtons.forEach(btn=>{
+          if(btn.dataset.lockGuard){
+            delete btn.dataset.lockGuard;
+            btn.disabled = false;
+            btn.removeAttribute('aria-disabled');
+          }
+        });
         const banner = el.querySelector('.lock-banner');
         if(banner) banner.style.display = 'none';
+        updateQuizAvailability(n);
       }
     }
 
