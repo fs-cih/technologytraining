@@ -24,6 +24,9 @@
     padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.04);position:sticky;top:0;z-index:4;
     display:flex;flex-direction:column;gap:16px;
   }
+  body.training-unlocked .intro{
+    position:static;top:auto;z-index:auto;
+  }
   .intro-body{display:flex;flex-direction:column;gap:12px;}
   h1{margin:0 0 8px 0;font-size:28px;line-height:1.2;}
   p.lead{margin:0 0 12px 0;color:#374151}
@@ -110,8 +113,9 @@
   .start-dialog h1{margin:0;font-size:30px;line-height:1.15;color:var(--text);}
   .start-dialog p{margin:0;color:#4b5563;}
   .start-dialog .form-fields{display:flex;flex-direction:column;gap:14px;}
-  .start-dialog label{font-weight:600;font-size:14px;color:#374151;}
-  .start-dialog input{margin-top:4px;}
+  .start-dialog label{font-weight:600;font-size:14px;color:#374151;display:flex;flex-direction:column;align-items:flex-start;gap:4px;}
+  .start-dialog label .field-label{display:block;}
+  .start-dialog input{margin-top:0;}
   .start-dialog .actions{margin:4px 0 0 0;}
 </style>
 </head>
@@ -119,15 +123,15 @@
   <div class="start-overlay" id="startOverlay" role="dialog" aria-modal="true" aria-labelledby="startTitle">
     <div class="start-dialog">
       <h1 id="startTitle">Annual Cybersecurity Training</h1>
-      <p>Enter your details to unlock the training content. Your certificate will use the name you provide.</p>
+      <p>Enter your details provided to unlock the training content. Your certificate will use the name you provide—include first and last name.</p>
       <div class="form-fields" id="startForm">
-        <label for="participantName">Name
+        <label for="participantName"><span class="field-label">Name</span>
           <input id="participantName" type="text" placeholder="Your full name" autocomplete="name" required>
         </label>
-        <label for="participantEmail">Email
+        <label for="participantEmail"><span class="field-label">Email</span>
           <input id="participantEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
         </label>
-        <label for="participantPassword">Password
+        <label for="participantPassword"><span class="field-label">Password</span>
           <input id="participantPassword" type="password" placeholder="Password123" autocomplete="new-password" required>
         </label>
       </div>
@@ -1055,6 +1059,7 @@
           updateTOC();
         }
         hideStartOverlay();
+        document.body.classList.add('training-unlocked');
         validateStartForm();
       });
     }
