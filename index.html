@@ -1196,13 +1196,12 @@
 
     function submitQuiz(n){
       // Gate on mode/video completion if watching
-      if(state.mode[n] === 'watch'){
-        if(!state.videoDone[n]){
-          const st = byId('status'+n);
-          st.textContent = 'Please watch at least 90% of the video before submitting the quiz.';
-          st.className = 'status warn';
-          return;
-        }
+      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n] && !state.videoBypass[n];
+      if(requiresVideo && !state.videoDone[n]){
+        const st = byId('status'+n);
+        st.textContent = 'Please watch at least 90% of the video before submitting the quiz.';
+        st.className = 'status warn';
+        return;
       }
 
       const form = byId('quiz'+n);
