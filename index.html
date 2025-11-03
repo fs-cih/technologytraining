@@ -38,11 +38,16 @@
   .btn:hover{background:var(--primary-700)}
   .btn:disabled{opacity:.55;cursor:not-allowed}
   .btn-admin{
-    background:#fff;color:#6b7280;border:1px solid var(--border);
+    background:var(--primary);
+    color:#fff;
   }
-  .btn-admin:hover{background:#f9fafb;color:#4b5563}
+  .btn-admin:hover{background:var(--primary-700);color:#fff}
   .btn-admin:disabled{
-    background:#fff;color:#9ca3af;border:1px solid var(--border);opacity:1;cursor:not-allowed;
+    background:#fff;
+    color:var(--muted);
+    border:1px solid var(--border);
+    box-shadow:none;
+    cursor:not-allowed;
   }
   .row{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px}
   .card{
@@ -627,7 +632,10 @@
       const password = passwordInput?.value || '';
       const emailValid = /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
       const passwordValid = password === REQUIRED_PASSWORD;
-      const ready = !!(name && emailValid && passwordValid);
+      const requiresPassword = !state.started && !state.adminOverride;
+      const ready = state.adminOverride
+        ? true
+        : !!(name && emailValid && (requiresPassword ? passwordValid : true));
       if(startBtn){
         startBtn.disabled = !ready;
       }
