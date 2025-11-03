@@ -37,6 +37,13 @@
   }
   .btn:hover{background:var(--primary-700)}
   .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn-admin{
+    background:#fff;color:#6b7280;border:1px solid var(--border);
+  }
+  .btn-admin:hover{background:#f9fafb;color:#4b5563}
+  .btn-admin:disabled{
+    background:#fff;color:#9ca3af;border:1px solid var(--border);opacity:1;cursor:not-allowed;
+  }
   .row{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px}
   .card{
     background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;
@@ -44,7 +51,6 @@
   }
   .card[data-view="notes"] .quiz-block{display:none;}
   .card[data-view="quiz"] .content-read{display:none;}
-  .card[data-view="quiz"] .return-to-quiz{display:none;}
   .card .view-notes{display:none;margin-top:6px;}
   .card.locked{opacity:.5}
   .card.locked .video-wrap{pointer-events:none;}
@@ -92,7 +98,6 @@
   .status.err{color:var(--danger)}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
   .intro .actions{margin-top:0;flex-direction:column;align-items:flex-start;gap:12px;}
-  .return-to-quiz{margin-top:16px;}
   .toc{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
   .toc .progress-pill{display:flex;align-items:center;font-size:13px;font-weight:700;}
   .toc .seg{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);
@@ -142,6 +147,7 @@
       </div>
       <div class="actions">
         <button id="startBtn" class="btn btn-start" disabled>Start Training</button>
+        <button id="adminBtn" class="btn btn-admin" disabled>Admin Login</button>
       </div>
     </div>
   </div>
@@ -314,7 +320,6 @@
               <p>These steps significantly reduce the chances of someone accessing your account without permission.</p>
             </section>
           </article>
-          <button type="button" class="btn return-to-quiz" data-segment="1">Return to Quiz</button>
         </div>
 
         <form id="quiz1" class="quiz-block">
@@ -378,7 +383,6 @@
             <li>Hover or long-press links to preview where they go.</li>
             <li>Report suspicious messages to your IT/contact.</li>
           </ul>
-          <button type="button" class="btn return-to-quiz" data-segment="2">Return to Quiz</button>
         </div>
 
         <form id="quiz2" class="quiz-block">
@@ -442,7 +446,6 @@
             <li>Automatic updates patch known vulnerabilities.</li>
             <li>Lock your screen when you step away.</li>
           </ul>
-          <button type="button" class="btn return-to-quiz" data-segment="3">Return to Quiz</button>
         </div>
 
         <form id="quiz3" class="quiz-block">
@@ -506,7 +509,6 @@
             <li>Confirm requests via a known contact method.</li>
             <li>When in doubt, stop and ask.</li>
           </ul>
-          <button type="button" class="btn return-to-quiz" data-segment="4">Return to Quiz</button>
         </div>
 
         <form id="quiz4" class="quiz-block">
@@ -583,14 +585,16 @@
       mode: { 1:'watch', 2:'read', 3:'read', 4:'read' },
       // current view (quiz or notes)
       view: { 1:'quiz', 2:'notes', 3:'notes', 4:'notes' },
-      // bypass flags for video requirement
-      videoBypass: { 1:false, 2:false, 3:false, 4:false }
+      // admin override for video requirement
+      adminOverride: false
     };
 
     // --- Helpers ---
     const byId = (id)=>document.getElementById(id);
     const REQUIRED_PASSWORD = 'Password123';
+    const ADMIN_PASSWORD = 'Password321';
     const startBtn = byId('startBtn');
+    const adminBtn = byId('adminBtn');
     const nameInput = byId('participantName');
     const emailInput = byId('participantEmail');
     const passwordInput = byId('participantPassword');
@@ -627,6 +631,15 @@
       if(startBtn){
         startBtn.disabled = !ready;
       }
+      if(adminBtn){
+        if(state.adminOverride){
+          adminBtn.textContent = 'Admin Mode Active';
+          adminBtn.disabled = true;
+        } else {
+          adminBtn.textContent = 'Admin Login';
+          adminBtn.disabled = password !== ADMIN_PASSWORD;
+        }
+      }
     }
 
     [nameInput, emailInput, passwordInput].forEach(input=>{
@@ -637,6 +650,8 @@
             evt.preventDefault();
             if(startBtn && !startBtn.disabled){
               startBtn.click();
+            } else if(adminBtn && !adminBtn.disabled){
+              adminBtn.click();
             }
           }
         });
@@ -908,10 +923,6 @@
       if(quizBlock){
         quizBlock.style.display = view === 'quiz' ? '' : 'none';
       }
-      const returnBtn = card?.querySelector('.return-to-quiz');
-      if(returnBtn){
-        returnBtn.style.display = view === 'notes' ? '' : 'none';
-      }
       const backBtn = card?.querySelector('.view-notes');
       if(backBtn){
         const toggle = togglesBySegment[n];
@@ -951,30 +962,6 @@
         setCardView(segment, 'notes');
       }
       return false;
-    }
-
-    function handleReturnToQuizClick(evt){
-      const segment = Number(evt.currentTarget.dataset.segment);
-      if(!segment) return;
-      const toggle = togglesBySegment[segment];
-      const hasWatchOption = !!toggle?.querySelector('.mode-option[data-mode="watch"]');
-      if(hasWatchOption){
-        triggerMode(segment, 'watch', false);
-      } else {
-        setCardView(segment, 'quiz');
-      }
-      if(videoSegments[segment]){
-        state.videoBypass[segment] = true;
-        const st = byId('status'+segment);
-        if(st && !state.complete[segment]){
-          st.textContent = '';
-          st.className = 'status';
-          st.dataset.videoComplete = 'true';
-        }
-      }
-      updateQuizAvailability(segment);
-      const quizBlock = byId('seg'+segment)?.querySelector('.quiz-block');
-      quizBlock?.scrollIntoView({ behavior:'smooth', block:'start' });
     }
 
     function handleBackToNotesClick(evt){
@@ -1019,7 +1006,7 @@
         btn.disabled = true;
         return;
       }
-      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n] && !state.videoBypass[n];
+      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n] && !state.adminOverride;
       btn.disabled = requiresVideo && !state.videoDone[n];
     }
 
@@ -1160,6 +1147,34 @@
       toggleCertLock(!allDone);
     }
 
+    function enableAdminOverride(){
+      if(state.adminOverride) return;
+      state.adminOverride = true;
+      for(let i=1;i<=4;i++){
+        if(videoSegments[i]){
+          const st = byId('status'+i);
+          if(st && !state.complete[i]){
+            st.textContent = 'Admin override active — quiz unlocked without video completion.';
+            st.className = 'status ok';
+            st.dataset.videoComplete = 'true';
+          }
+        }
+        updateQuizAvailability(i);
+      }
+      if(!state.started){
+        state.started = true;
+        lockSeg(1,false);
+      }
+      updateTOC();
+      hideStartOverlay();
+      document.body.classList.add('training-unlocked');
+      if(adminBtn){
+        adminBtn.textContent = 'Admin Mode Active';
+        adminBtn.disabled = true;
+      }
+      validateStartForm();
+    }
+
     // Start button
     if(startBtn){
       startBtn.addEventListener('click', ()=>{
@@ -1174,14 +1189,18 @@
       });
     }
 
+    if(adminBtn){
+      adminBtn.addEventListener('click', ()=>{
+        if(adminBtn.disabled) return;
+        enableAdminOverride();
+      });
+    }
+
     // Initialize locks
     lockSeg(1,true); lockSeg(2,true); lockSeg(3,true); lockSeg(4,true);
     toggleCertLock(true);
 
     document.querySelectorAll('.mode-toggle').forEach(initModeToggle);
-    document.querySelectorAll('.return-to-quiz').forEach(btn=>{
-      btn.addEventListener('click', handleReturnToQuizClick);
-    });
     document.querySelectorAll('.view-notes').forEach(btn=>{
       btn.addEventListener('click', handleBackToNotesClick);
     });
@@ -1196,7 +1215,7 @@
 
     function submitQuiz(n){
       // Gate on mode/video completion if watching
-      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n] && !state.videoBypass[n];
+      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n] && !state.adminOverride;
       if(requiresVideo && !state.videoDone[n]){
         const st = byId('status'+n);
         st.textContent = 'Please watch at least 90% of the video before submitting the quiz.';
@@ -1245,9 +1264,16 @@
       state.videoDone[n] = false;
       state.quizScore[n] = null;
       state.complete[n] = false;
-      state.videoBypass[n] = false;
       clearVideoStatus(n);
       setCardView(n, state.mode[n] === 'watch' ? 'quiz' : 'notes');
+      if(state.adminOverride && videoSegments[n]){
+        const st = byId('status'+n);
+        if(st){
+          st.textContent = 'Admin override active — quiz unlocked without video completion.';
+          st.className = 'status ok';
+          st.dataset.videoComplete = 'true';
+        }
+      }
 
       // If segment had a player and was at end, seek to 0
       if(n===1 && video1El){
