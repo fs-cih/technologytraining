@@ -89,6 +89,29 @@
   .audio-progress-wrap{flex:1;display:flex;flex-direction:column;gap:6px;}
   .audio-progress{width:100%;accent-color:var(--primary);}
   .audio-time{font-size:13px;color:#4b5563;}
+  .highlight-note{
+    background:#fef3c7;
+    border:1px solid #f59e0b;
+    color:#92400e;
+    padding:10px 14px;
+    border-radius:10px;
+    font-weight:600;
+    margin:12px 0;
+  }
+  .content-read > .highlight-note:first-child{margin-top:0;}
+  .quiz-placeholder-note{margin-top:0;}
+  .card[data-view="notes"] .quiz-placeholder-note{display:none;}
+  .video-placeholder{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#f9fafb;
+    font-weight:600;
+    font-size:16px;
+    padding:18px;
+    min-height:120px;
+    text-align:center;
+  }
   @media (max-width:520px){
     .audio-player{flex-direction:column;align-items:stretch;}
     .audio-toggle{margin:0 auto;}
@@ -369,19 +392,26 @@
       </section>
 
       <!-- Segment 2 -->
-      <section class="card locked" id="seg2" data-view="notes" aria-disabled="true">
+      <section class="card locked" id="seg2" data-view="quiz" aria-disabled="true">
         <div class="lock-banner">Locked — complete Segment 1</div>
         <h2>Segment 2 — Phishing & Suspicious Messages</h2>
         <div class="section-controls">
-          <div class="mode-toggle" data-segment="2" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 2 format">
+          <div class="mode-toggle" data-segment="2" data-initial="watch" data-options="2" role="radiogroup" aria-label="Segment 2 format">
             <span class="mode-thumb" aria-hidden="true"></span>
-            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Video Notes</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="watch">Watch</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="false" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote2" class="small muted" data-note-read="These notes contain the information discussed in the video.">These notes contain the information discussed in the video.</span>
+          <span id="modeNote2" class="small muted" data-note-watch="A training video for this segment is coming soon. Use the quiz below when you're ready." data-note-read="These notes contain the information discussed in the video.">A training video for this segment is coming soon. Use the quiz below when you're ready.</span>
         </div>
+
+        <div class="video-wrap video-16x9" id="videoWrap2">
+          <div class="video-placeholder">Video placeholder</div>
+        </div>
+        <div class="highlight-note quiz-placeholder-note">This is where the video will go.</div>
 
         <!-- Read mode content -->
         <div class="content-read" id="read2">
+          <div class="highlight-note">This is where the notes will go.</div>
           <p><strong>Red flags:</strong> unexpected password resets, urgent tone, strange sender, links that don’t match the display text, requests for sensitive info.</p>
           <ul>
             <li>Pause and verify via a known channel if something feels off.</li>
@@ -433,18 +463,24 @@
       </section>
 
       <!-- Segment 3 -->
-      <section class="card locked" id="seg3" data-view="notes" aria-disabled="true">
+      <section class="card locked" id="seg3" data-view="quiz" aria-disabled="true">
         <div class="lock-banner">Locked — complete Segment 2</div>
         <h2>Segment 3 — Device Safety & Public Networks</h2>
         <div class="section-controls">
-          <div class="mode-toggle" data-segment="3" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 3 format">
+          <div class="mode-toggle" data-segment="3" data-initial="watch" data-options="2" role="radiogroup" aria-label="Segment 3 format">
             <span class="mode-thumb" aria-hidden="true"></span>
-            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Video Notes</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="watch">Watch</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="false" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote3" class="small muted" data-note-read="These notes contain the information discussed in the video.">These notes contain the information discussed in the video.</span>
+          <span id="modeNote3" class="small muted" data-note-watch="A training video for this segment is coming soon. Use the quiz below when you're ready." data-note-read="These notes contain the information discussed in the video.">A training video for this segment is coming soon. Use the quiz below when you're ready.</span>
         </div>
+        <div class="video-wrap video-16x9" id="videoWrap3">
+          <div class="video-placeholder">Video placeholder</div>
+        </div>
+        <div class="highlight-note quiz-placeholder-note">This is where the video will go.</div>
         <div class="hr"></div>
         <div class="content-read" id="read3">
+          <div class="highlight-note">This is where the notes will go.</div>
           <p><strong>Key ideas:</strong> Use updates, lock screens, avoid public Wi-Fi or use VPN/hotspot, never plug in unknown USB devices.</p>
           <ul>
             <li>Public Wi-Fi exposes traffic; attackers can snoop.</li>
@@ -496,18 +532,24 @@
       </section>
 
       <!-- Segment 4 -->
-      <section class="card locked" id="seg4" data-view="notes" aria-disabled="true">
+      <section class="card locked" id="seg4" data-view="quiz" aria-disabled="true">
         <div class="lock-banner">Locked — complete Segment 3</div>
         <h2>Segment 4 — Data Handling & Real-World Scenarios</h2>
         <div class="section-controls">
-          <div class="mode-toggle" data-segment="4" data-initial="read" data-options="1" role="radiogroup" aria-label="Segment 4 format">
+          <div class="mode-toggle" data-segment="4" data-initial="watch" data-options="2" role="radiogroup" aria-label="Segment 4 format">
             <span class="mode-thumb" aria-hidden="true"></span>
-            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="read">Video Notes</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="watch">Watch</button>
+            <button type="button" class="mode-option" role="radio" aria-checked="false" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote4" class="small muted" data-note-read="These notes contain the information discussed in the video.">These notes contain the information discussed in the video.</span>
+          <span id="modeNote4" class="small muted" data-note-watch="A training video for this segment is coming soon. Use the quiz below when you're ready." data-note-read="These notes contain the information discussed in the video.">A training video for this segment is coming soon. Use the quiz below when you're ready.</span>
         </div>
+        <div class="video-wrap video-16x9" id="videoWrap4">
+          <div class="video-placeholder">Video placeholder</div>
+        </div>
+        <div class="highlight-note quiz-placeholder-note">This is where the video will go.</div>
         <div class="hr"></div>
         <div class="content-read" id="read4">
+          <div class="highlight-note">This is where the notes will go.</div>
           <p><strong>Key ideas:</strong> Verify identity before sharing sensitive info, use secure channels, and ask if unsure. Apply the “pause → verify → proceed” habit.</p>
           <ul>
             <li>Don’t email confidential data without protection.</li>
@@ -587,9 +629,9 @@
       // locked/ready
       locked: { 1:true, 2:true, 3:true, 4:true },
       // chosen modes
-      mode: { 1:'watch', 2:'read', 3:'read', 4:'read' },
+      mode: { 1:'watch', 2:'watch', 3:'watch', 4:'watch' },
       // current view (quiz or notes)
-      view: { 1:'quiz', 2:'notes', 3:'notes', 4:'notes' },
+      view: { 1:'quiz', 2:'quiz', 3:'quiz', 4:'quiz' },
       // admin override for video requirement
       adminOverride: false
     };
@@ -679,7 +721,10 @@
     }
 
     const videoSegments = {
-      1: { type:'html', wrapId:'videoWrap1', videoId:'video1' }
+      1: { type:'html', wrapId:'videoWrap1', videoId:'video1' },
+      2: { type:'placeholder', wrapId:'videoWrap2' },
+      3: { type:'placeholder', wrapId:'videoWrap3' },
+      4: { type:'placeholder', wrapId:'videoWrap4' }
     };
 
     const video1El = byId('video1');
@@ -1014,7 +1059,7 @@
         btn.disabled = true;
         return;
       }
-      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n] && !state.adminOverride;
+      const requiresVideo = state.mode[n] === 'watch' && videoSegments[n]?.type === 'html' && !state.adminOverride;
       btn.disabled = requiresVideo && !state.videoDone[n];
     }
 
@@ -1159,7 +1204,7 @@
       if(state.adminOverride) return;
       state.adminOverride = true;
       for(let i=1;i<=4;i++){
-        if(videoSegments[i]){
+        if(videoSegments[i]?.type === 'html'){
           const st = byId('status'+i);
           if(st && !state.complete[i]){
             st.textContent = 'Admin override active — quiz unlocked without video completion.';
@@ -1223,7 +1268,7 @@
 
     function submitQuiz(n){
       // Gate on mode/video completion if watching
-      const requiresVideo = state.mode[n] === 'watch' && !!videoSegments[n] && !state.adminOverride;
+      const requiresVideo = state.mode[n] === 'watch' && videoSegments[n]?.type === 'html' && !state.adminOverride;
       if(requiresVideo && !state.videoDone[n]){
         const st = byId('status'+n);
         st.textContent = 'Please watch at least 90% of the video before submitting the quiz.';
@@ -1274,7 +1319,7 @@
       state.complete[n] = false;
       clearVideoStatus(n);
       setCardView(n, state.mode[n] === 'watch' ? 'quiz' : 'notes');
-      if(state.adminOverride && videoSegments[n]){
+      if(state.adminOverride && videoSegments[n]?.type === 'html'){
         const st = byId('status'+n);
         if(st){
           st.textContent = 'Admin override active — quiz unlocked without video completion.';
