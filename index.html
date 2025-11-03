@@ -185,7 +185,7 @@
     <div class="intro">
       <div class="intro-body">
         <h2 style="margin:0;font-size:24px;line-height:1.2;">Cybersecurity Awareness Training Overview</h2>
-        <p class="lead">This short course has four segments. Choose to <strong>read</strong> or <strong>watch</strong> in each segment, then pass a 5-question quiz (score 4/5) to unlock the next segment. When you finish all four segments, generate your certificate using the name you entered to begin.</p>
+        <p class="lead">Welcome to CIH's annual cybersecurity training platform. This training has four segments. Watch each video (you must watch 90% of the video before the quiz is unlocked), then pass a 5-question quiz to unlock the next segment. Toggle to the "Video Notes" section in each segment to read about what the video covers or listen to a conversation about the content. When you finish all four segments, generate your certificate using the name you entered to begin.</p>
         <button type="button" class="link-button" id="editDetailsBtn">Update name or email address</button>
       </div>
       <div class="toc" id="toc">
@@ -604,7 +604,7 @@
       <section class="card footer-card locked" id="certCard" aria-disabled="true">
         <div class="lock-banner">Locked — complete all 4 segments</div>
         <h2>Certificate of Completion</h2>
-        <p>Congratulations! You completed this year's annual cybersecurity training. Generating your certificate will download a PDF certificate of completion to your browser's downloads. Make sure to save a copy and email it to the point of contact provided to you.</p>
+        <p>Congratulations! Thank you for completing this year's annual cybersecurity training. Click the blue &ldquo;Generate Certificate (PDF)&rdquo; button; generating your certificate will download a PDF-formatted certificate of completion to your browser's downloaded files. Make sure to save a copy and email it to the point of contact provided to you.</p>
         <div class="actions">
           <button class="btn" id="genCertBtn" onclick="generateCertificate()" disabled>Generate Certificate (PDF)</button>
           <span id="certStatus" class="status" aria-live="polite"></span>
@@ -1286,7 +1286,7 @@
       state.quizScore[n] = score;
 
       const st = byId('status'+n);
-      if(score >= 4){
+      if(score === 5){
         st.textContent = `Passed ✔ (${score}/5). Segment complete.`;
         st.className = 'status ok';
         state.complete[n] = true;
@@ -1295,7 +1295,7 @@
         updateTOC();
       } else {
         // FAIL RULE: relock & reset
-        st.textContent = `Score ${score}/5 — You must score 4/5. Segment has been reset. Please rewatch/reread and try again.`;
+        st.textContent = `Score ${score}/5 — You must score 5/5. Segment has been reset. Please rewatch/reread and try again.`;
         st.className = 'status err';
         resetSegment(n, /*silent=*/true);
         lockSeg(n, false); // keep current open but reset content
