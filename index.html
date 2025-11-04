@@ -89,6 +89,7 @@
   .audio-progress-wrap{flex:1;display:flex;flex-direction:column;gap:6px;}
   .audio-progress{width:100%;accent-color:var(--primary);}
   .audio-time{font-size:13px;color:#4b5563;}
+  .section-title-underline{font-weight:400;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;}
   .highlight-note{
     background:#fef3c7;
     border:1px solid #f59e0b;
@@ -604,20 +605,31 @@
             <button type="button" class="mode-option" role="radio" aria-checked="true" data-mode="watch">Watch</button>
             <button type="button" class="mode-option" role="radio" aria-checked="false" data-mode="read">Video Notes</button>
           </div>
-          <span id="modeNote4" class="small muted" data-note-watch="A training video for this segment is coming soon. Use the quiz below when you're ready." data-note-read="These notes contain the information discussed in the video.">A training video for this segment is coming soon. Use the quiz below when you're ready.</span>
+          <span id="modeNote4" class="small muted" data-note-watch="Watch the video (at least 90%) then take the quiz." data-note-read="These notes contain the information discussed in the video.">Watch the video (at least 90%) then take the quiz.</span>
         </div>
         <div class="video-wrap video-16x9" id="videoWrap4">
-          <div class="video-placeholder">Video placeholder</div>
+          <video id="video4" controls preload="metadata" src="Segment+4+Video.mp4">
+            Sorry, your browser doesn't support embedded videos.
+          </video>
         </div>
-        <div class="highlight-note quiz-placeholder-note">This is where the video will go.</div>
         <div class="hr"></div>
         <div class="content-read" id="read4">
+          <div class="audio-player" data-segment="4">
+            <button type="button" class="audio-toggle" aria-label="Play audio narration for Research Project and Field-Based Work Cybersecurity Practices" data-play-label="Play audio narration for Research Project and Field-Based Work Cybersecurity Practices" data-pause-label="Pause audio narration for Research Project and Field-Based Work Cybersecurity Practices">
+              <span class="audio-icon" aria-hidden="true">▶</span>
+            </button>
+            <div class="audio-progress-wrap">
+              <input type="range" class="audio-progress" value="0" min="0" max="100" step="0.1" aria-label="Audio playback progress">
+              <span class="audio-time" aria-live="polite">0:00 / 0:00</span>
+            </div>
+            <audio preload="metadata" src="Segment+4+Audio.mp3"></audio>
+          </div>
           <article>
             <h3>Research Project and Field-Based Work Cybersecurity Practices</h3>
             <p>This section explains the expectations for safeguarding research data, participant identity, and organizational trust when conducting work in community-based settings. Because we work directly with tribal nations and communities, confidentiality and secure data handling are not merely technical requirements but relational commitments—protecting dignity, respect, and sovereignty. Cybersecurity in this context is about honoring the trust families, youth, Elders, and local partners place in us by sharing their time, stories, personal information, and lived experiences. Every team member, regardless of role or length of employment, shares this responsibility.</p>
 
             <section>
-              <h4>1. Protecting Participant Identity &amp; Sensitive Data</h4>
+              <h4 class="section-title-underline">1. Protecting Participant Identity &amp; Sensitive Data</h4>
               <p>Protecting participant identity is one of the most important responsibilities of anyone engaged in community-based research. In many communities, a participant does not exist as an isolated individual; they are part of a family, a household, and a broader network of relationships. Because of these close community ties, even very small details—such as a neighborhood, family structure, or a mention of a medical appointment—can indirectly reveal a person’s identity. Protecting identity therefore requires careful attention not just to what you store and document, but to what you say in public, where you use your device, how you manage printed materials, and how you speak about your day-to-day role.</p>
               <p>Research staff are also responsible for following federal laws that protect privacy. HIPAA (Health Insurance Portability and Accountability Act) applies to health information that can be tied to a specific person (for example, diagnoses, screenings, clinical referrals, medication status, treatment engagement, etc.). If your research involves any connection to a healthcare provider, clinic, community health program, or any medical record, HIPAA standards apply. Protected Health Information (PHI) must never be stored on unapproved platforms, shared through personal messaging, or discussed casually. Likewise, research conducted in or with schools may involve FERPA (Family Educational Rights and Privacy Act), which protects student education records and personally identifiable information about children and youth. If a research project engages with students, schools, teachers, parents, school-based behavioral health teams, or attendance records, student information is considered educationally protected and must be handled with the same strict confidentiality.</p>
               <p>CIH’s research agreements with Tribal Nations also emphasize that participant information belongs to the Tribal community, not to any university, program, or researcher. This means that confidentiality is also part of honoring sovereignty. When community members share their information, they are choosing to trust the person in front of them—you or a member of your team. Protecting that trust helps maintain the integrity, reputation, and long-term collaboration of the CIH and supports the community’s right to determine how data are collected, interpreted, stored, and used.</p>
@@ -634,7 +646,7 @@
             </section>
 
             <section>
-              <h4>2. Device Handling in Community Settings</h4>
+              <h4 class="section-title-underline">2. Device Handling in Community Settings</h4>
               <p>Field-based work means that staff often travel between homes, schools, community centers, and clinics—environments that are less controlled and less secure than office settings. This makes safeguarding your work laptop, tablet, or phone especially important. Devices can be lost, borrowed by others, accidentally viewed by people nearby, or left unlocked during a quick conversation or visit interruption. Your device is a gateway into the research data system and must be treated as a confidential work tool, not a personal computer. Keeping your device physically secure and digitally locked ensures that participant data and project materials are protected even if you are working in dynamic environments.</p>
               <p><strong>Key Guidelines:</strong></p>
               <ul>
@@ -647,7 +659,7 @@
             </section>
 
             <section>
-              <h4>3. Data Recording &amp; Transfer Protocols</h4>
+              <h4 class="section-title-underline">3. Data Recording &amp; Transfer Protocols</h4>
               <p>Many research projects use digital data collection platforms to ensure secure storage, encryption, and proper tracking of research records. Proper handling of data means using the approved systems every time and avoiding temporary workarounds that feel convenient in the moment but create risk. The biggest mistakes happen when data are saved locally on devices or when syncing procedures are not followed. Ensuring that your data uploads correctly before leaving a site—or as soon as you regain connectivity—protects against accidental data loss, duplication, or compromised confidentiality.</p>
               <p><strong>Key Guidelines:</strong></p>
               <ul>
@@ -729,34 +741,45 @@
         <form id="quiz4" class="quiz-block">
           <fieldset>
             <div class="q">
-              <p>1) Before sharing sensitive information you should…</p>
-              <label><input type="radio" name="q4a" value="a"> Verify who’s asking and why</label>
-              <label><input type="radio" name="q4a" value="b"> Send it right away</label>
-              <label><input type="radio" name="q4a" value="c"> Post it to chat</label>
+              <p>1) Which of the following best describes why confidentiality is especially important in small or close-knit communities?</p>
+              <label><input type="radio" name="q4a" value="a"> Because people in small towns gossip more</label>
+              <label><input type="radio" name="q4a" value="b"> Because research projects must avoid being slowed down</label>
+              <label><input type="radio" name="q4a" value="c"> Because even small details can reveal someone’s identity due to strong relational networks</label>
+              <label><input type="radio" name="q4a" value="d"> Because researchers are required to avoid asking too many questions</label>
             </div>
             <div class="q">
-              <p>2) Safer channel for confidential files?</p>
-              <label><input type="radio" name="q4b" value="a"> Public social media</label>
-              <label><input type="radio" name="q4b" value="b"> Approved encrypted storage/link</label>
-              <label><input type="radio" name="q4b" value="c"> Unsecured personal email</label>
+              <p>2) Which of the following are examples of PII (Personally Identifiable Information)? <span class="muted">(Select all that apply.)</span></p>
+              <label><input type="checkbox" name="q4b" value="full-name"> Full name</label>
+              <label><input type="checkbox" name="q4b" value="date-of-birth"> Date of birth</label>
+              <label><input type="checkbox" name="q4b" value="home-address"> Home address</label>
+              <label><input type="checkbox" name="q4b" value="phone-number"> Phone number</label>
+              <label><input type="checkbox" name="q4b" value="tribal-affiliation"> Tribal affiliation when linked to a specific person</label>
+              <label><input type="checkbox" name="q4b" value="meeting-time"> Scheduled meeting time</label>
+              <label><input type="checkbox" name="q4b" value="age-range"> Age range (e.g., 25–30)</label>
+              <label><input type="checkbox" name="q4b" value="family-relationships"> Family relationships</label>
+              <label><input type="checkbox" name="q4b" value="participant-photo"> Photo of the participant’s face</label>
+              <label><input type="checkbox" name="q4b" value="study-id"> Study ID number (coded, no key attached)</label>
             </div>
             <div class="q">
-              <p>3) If an email feels “off”, you should…</p>
-              <label><input type="radio" name="q4c" value="a"> Ignore instincts</label>
-              <label><input type="radio" name="q4c" value="b"> Pause and verify</label>
-              <label><input type="radio" name="q4c" value="c"> Forward to your contacts</label>
+              <p>3) Which of the following best describes the Minimum Necessary Standard?</p>
+              <label><input type="radio" name="q4c" value="a"> Accessing all project data to be fully informed</label>
+              <label><input type="radio" name="q4c" value="b"> Keeping your own unofficial notes separate to help memory</label>
+              <label><input type="radio" name="q4c" value="c"> Only accessing the specific participant information required to do your assigned work</label>
+              <label><input type="radio" name="q4c" value="d"> Sharing information with community partners if they are trusted</label>
             </div>
             <div class="q">
-              <p>4) Sharing passwords with coworkers is…</p>
-              <label><input type="radio" name="q4d" value="a"> Fine if you trust them</label>
-              <label><input type="radio" name="q4d" value="b"> Not acceptable; use access controls</label>
-              <label><input type="radio" name="q4d" value="c"> Encouraged</label>
+              <p>4) Which statement best describes how HIPAA and FERPA relate to research in community and school settings?</p>
+              <label><input type="radio" name="q4d" value="a"> HIPAA only applies to hospitals, and FERPA only applies to colleges</label>
+              <label><input type="radio" name="q4d" value="b"> HIPAA and FERPA are interchangeable and cover the same types of information</label>
+              <label><input type="radio" name="q4d" value="c"> HIPAA protects personal health information, while FERPA protects student education records; in some school-based research settings, FERPA takes precedence</label>
+              <label><input type="radio" name="q4d" value="d"> HIPAA applies only when written consent is not provided</label>
             </div>
             <div class="q">
-              <p>5) Best immediate action if you sent data to the wrong person?</p>
-              <label><input type="radio" name="q4e" value="a"> Do nothing</label>
-              <label><input type="radio" name="q4e" value="b"> Notify your support/IT immediately</label>
-              <label><input type="radio" name="q4e" value="c"> Tweet about it</label>
+              <p>5) Which of the following is the correct response if you accidentally view a participant’s protected record (health or educational) that you were not authorized to access?</p>
+              <label><input type="radio" name="q4e" value="a"> Close the file and avoid mentioning it to prevent getting in trouble</label>
+              <label><input type="radio" name="q4e" value="b"> Make a personal note so you remember not to look again</label>
+              <label><input type="radio" name="q4e" value="c"> Report the incident immediately to your supervisor or project lead and document what occurred</label>
+              <label><input type="radio" name="q4e" value="d"> Wait until someone else notices the situation before taking action</label>
             </div>
           </fieldset>
           <div class="actions">
@@ -892,7 +915,7 @@
       1: { type:'html', wrapId:'videoWrap1', videoId:'video1' },
       2: { type:'html', wrapId:'videoWrap2', videoId:'video2' },
       3: { type:'placeholder', wrapId:'videoWrap3' },
-      4: { type:'placeholder', wrapId:'videoWrap4' }
+      4: { type:'html', wrapId:'videoWrap4', videoId:'video4' }
     };
 
     function attachVideoTracking(n, videoEl){
@@ -1440,8 +1463,48 @@
       1: { q1a:'b', q1b:'b', q1c:'b', q1d:'b', q1e:'a' },
       2: { q2a:'a', q2b:'b', q2c:'b', q2d:'b', q2e:'b' },
       3: { q3a:'b', q3b:'b', q3c:'b', q3d:'b', q3e:'a' },
-      4: { q4a:'a', q4b:'b', q4c:'b', q4d:'b', q4e:'b' }
+      4: {
+        q4a:'c',
+        q4b:['full-name','date-of-birth','home-address','phone-number','tribal-affiliation','family-relationships','participant-photo'],
+        q4c:'c',
+        q4d:'c',
+        q4e:'c'
+      }
     };
+
+    function isQuestionCorrect(form, name, spec){
+      if(typeof spec === 'string'){
+        const sel = form.querySelector(`input[name="${name}"]:checked`);
+        return !!sel && sel.value === spec;
+      }
+      if(Array.isArray(spec)){
+        const checkedValues = Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(input=>input.value);
+        if(spec.length === 0){
+          return checkedValues.length === 0;
+        }
+        const hasAll = spec.every(val=>checkedValues.includes(val));
+        const hasExtra = checkedValues.some(val=>!spec.includes(val));
+        return hasAll && !hasExtra;
+      }
+      if(spec && typeof spec === 'object'){
+        if(spec.type === 'single'){
+          const sel = form.querySelector(`input[name="${name}"]:checked`);
+          return !!sel && sel.value === spec.correct;
+        }
+        if(spec.type === 'multi'){
+          const required = Array.isArray(spec.correct) ? spec.correct : [];
+          const checkedValues = Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(input=>input.value);
+          const hasAll = required.every(val=>checkedValues.includes(val));
+          const hasExtra = checkedValues.some(val=>!required.includes(val));
+          if(spec.requireAll === false && typeof spec.minCorrect === 'number'){
+            const correctCount = checkedValues.filter(val=>required.includes(val)).length;
+            return correctCount >= spec.minCorrect && !hasExtra;
+          }
+          return hasAll && !hasExtra;
+        }
+      }
+      return false;
+    }
 
     function submitQuiz(n){
       // Gate on mode/video completion if watching
@@ -1454,17 +1517,23 @@
       }
 
       const form = byId('quiz'+n);
+      if(!form){
+        console.warn('Quiz form missing for segment', n);
+        return;
+      }
       const answers = keys[n];
-      let score = 0, total = 5;
-      for(const k of Object.keys(answers)){
-        const sel = form.querySelector(`input[name="${k}"]:checked`);
-        if(sel && sel.value === answers[k]) score++;
+      let score = 0;
+      const total = Object.keys(answers).length;
+      for(const [question, spec] of Object.entries(answers)){
+        if(isQuestionCorrect(form, question, spec)){
+          score++;
+        }
       }
       state.quizScore[n] = score;
 
       const st = byId('status'+n);
-      if(score === 5){
-        st.textContent = `Passed ✔ (${score}/5). Segment complete.`;
+      if(score === total){
+        st.textContent = `Passed ✔ (${score}/${total}). Segment complete.`;
         st.className = 'status ok';
         state.complete[n] = true;
         // unlock next segment
@@ -1472,7 +1541,7 @@
         updateTOC();
       } else {
         // FAIL RULE: relock & reset
-        st.textContent = `Score ${score}/5 — You must score 5/5. Segment has been reset. Please rewatch/reread and try again.`;
+        st.textContent = `Score ${score}/${total} — You must score ${total}/${total}. Segment has been reset. Please rewatch/reread and try again.`;
         st.className = 'status err';
         resetSegment(n, /*silent=*/true);
         lockSeg(n, false); // keep current open but reset content
@@ -1482,7 +1551,8 @@
     function resetSegment(n, silent){
       // Clear radio selections
       const form = byId('quiz'+n);
-      const inputs = form.querySelectorAll('input[type="radio"]');
+      if(!form) return;
+      const inputs = form.querySelectorAll('input[type="radio"], input[type="checkbox"]');
       inputs.forEach(i=> i.checked = false);
 
       // Reset status
