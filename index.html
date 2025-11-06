@@ -829,6 +829,9 @@
 
     // --- Helpers ---
     const byId = (id)=>document.getElementById(id);
+    // Update the secret to the same value stored in the Apps Script project properties.
+    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxBhr1VQKW9m-WLNunQCH7i4BXhJnPh41Gaddnl3d1GemwBl75JakJVJNZFPfrD5LCh/exec';
+    const WEBAPP_SHARED_SECRET = 'REPLACE_WITH_SHARED_SECRET';
     const REQUIRED_PASSWORD = 'Password123';
     const ADMIN_PASSWORD = 'Password321';
     const startBtn = byId('startBtn');
@@ -880,6 +883,32 @@
           adminBtn.textContent = 'Admin Login';
           adminBtn.disabled = password !== ADMIN_PASSWORD;
         }
+      }
+    }
+
+    function recordCompletionToSheet(name, email){
+      const pwd = passwordInput?.value || '';
+      const url = (WEBAPP_URL || '').trim();
+      const secret = (WEBAPP_SHARED_SECRET || '').trim();
+      if(!window.fetch || !url || !secret || url.includes('PASTE_WEB_APP_URL_HERE') || secret.includes('PASTE_') || secret === 'REPLACE_WITH_SHARED_SECRET'){
+        return;
+      }
+      const payload = {
+        name,
+        email,
+        pwd,
+        pageId: location.pathname || '',
+        userAgent: navigator.userAgent || '',
+        secret
+      };
+      try {
+        fetch(url, {
+          method:'POST',
+          mode:'no-cors',
+          body: JSON.stringify(payload)
+        });
+      } catch(err){
+        console.error('Unable to record completion', err);
       }
     }
 
@@ -1598,6 +1627,7 @@
     // Certificate
     async function generateCertificate(){
       const name = (nameInput?.value || '').trim();
+      const email = (emailInput?.value || '').trim();
       if(!name){
         byId('certStatus').textContent = 'Please enter your name in the top form.';
         byId('certStatus').className = 'status warn';
@@ -1626,6 +1656,8 @@
         byId('certStatus').className = 'status err';
         return;
       }
+
+      recordCompletionToSheet(name, email);
 
       const doc = new jsPdfCtor({ unit:'pt', format:'letter' });
 
