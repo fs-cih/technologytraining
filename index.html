@@ -318,7 +318,7 @@
               <p><strong>Example storage method:</strong> Store printed recovery codes in a sealed envelope at home in a private place — not in your wallet or desk.</p>
             </section>
 
-            <h3>Common Pitfalls to Avoid</h3>
+            <h3>4. Common Pitfalls to Avoid</h3>
             <section>
               <p>Even with strong passwords and MFA, habits matter. Some behaviors can undo the protection.</p>
               <ul>
@@ -336,7 +336,7 @@
               </ul>
             </section>
 
-            <h3>Key Takeaways</h3>
+            <h3>5. Key Takeaways</h3>
             <section>
               <ul>
                 <li>Use <strong>long passphrases</strong> instead of short, complex passwords.</li>
@@ -794,7 +794,7 @@
       <section class="card footer-card locked" id="certCard" aria-disabled="true">
         <div class="lock-banner">Locked — complete all 4 segments</div>
         <h2>Certificate of Completion</h2>
-        <p>Congratulations! Thank you for completing this year's annual cybersecurity training. Click the blue &ldquo;Generate Certificate (PDF)&rdquo; button; generating your certificate will download a PDF-formatted certificate of completion to your browser's downloaded files. Make sure to save a copy and email it to the point of contact provided to you.</p>
+        <p>Congratulations! Thank you for completing this year's annual cybersecurity training. Click the blue &ldquo;Generate Certificate (PDF)&rdquo; button; generating your certificate will download a PDF-formatted certificate of completion to your browser's downloaded files. Make sure to save a copy and email it to the point of contact provided to you. An alphanumeric certificate ID will appear after you click &ldquo;Generate Certificate (PDF)&rdquo; that matches your certificate. If you have any issues, please write down your certificate ID and share this code with your organizational point of contact.</p>
         <div class="actions">
           <button class="btn" id="genCertBtn" onclick="generateCertificate()" disabled>Generate Certificate (PDF)</button>
           <span id="certStatus" class="status" aria-live="polite"></span>
@@ -823,7 +823,8 @@
       // current view (quiz or notes)
       view: { 1:'quiz', 2:'quiz', 3:'quiz', 4:'quiz' },
       // admin override for video requirement
-      adminOverride: false
+      adminOverride: false,
+      certificateCode: null
     };
 
     // --- Helpers ---
@@ -1624,6 +1625,19 @@
     }
 
     // Certificate
+    function generateCertificateCode(){
+      const letters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ';
+      const digits = '123456789';
+      const pick = (pool, count)=>{
+        let result = '';
+        for(let i = 0; i < count; i++){
+          result += pool[Math.floor(Math.random() * pool.length)];
+        }
+        return result;
+      };
+      return pick(letters, 5) + pick(digits, 4) + pick(letters, 3) + pick(digits, 2) + pick(letters, 1);
+    }
+
     async function generateCertificate(){
       const name = (nameInput?.value || '').trim();
       const email = (emailInput?.value || '').trim();
@@ -1659,6 +1673,8 @@
       recordCompletionToSheet(name, email);
 
       const doc = new jsPdfCtor({ unit:'pt', format:'letter' });
+      const certificateCode = generateCertificateCode();
+      state.certificateCode = certificateCode;
 
       // Header
       doc.setFont('helvetica','bold');
@@ -1682,24 +1698,29 @@
 
       // Checklist
       doc.setFont('helvetica','bold');
-      doc.text('Completed Segments', 72, 240);
+      doc.text('Next Steps', 72, 240);
       doc.setFont('helvetica','normal');
-      const lines = [
-        `1) Passwords & MFA  — ${state.complete[1] ? '✅' : '⚠️'}`,
-        `2) Phishing         — ${state.complete[2] ? '✅' : '⚠️'}`,
-        `3) Device Safety    — ${state.complete[3] ? '✅' : '⚠️'}`,
-        `4) Data Handling    — ${state.complete[4] ? '✅' : '⚠️'}`
-      ];
+      const nextStepsText = 'Thank you for completing this year\'s Cybersecurity Awareness Training. Please follow the instructions you were provided and email a copy of this certificate with the individual identified in those instructions.';
+      const wrappedNextSteps = doc.splitTextToSize(nextStepsText, 468);
       let y = 265;
-      lines.forEach(l=>{ doc.text(l, 72, y); y += 22; });
+      wrappedNextSteps.forEach(line=>{
+        doc.text(line, 72, y);
+        y += 18;
+      });
+
+      y += 12;
+      doc.setFont('helvetica','bold');
+      doc.text('Certificate Code', 72, y);
+      y += 24;
+      doc.setFont('helvetica','normal');
+      doc.text(certificateCode, 72, y);
 
       // Footer
       doc.setDrawColor(220); doc.line(72, 640, 540, 640);
       doc.setFontSize(10);
-      doc.text('Issued by: Your Organization', 72, 660);
 
       doc.save(`Cybersecurity-Certificate-${name.replace(/\s+/g,'_')}.pdf`);
-      byId('certStatus').textContent = 'Certificate generated.';
+      byId('certStatus').textContent = `Certificate generated. Your certificate code is ${certificateCode}`;
       byId('certStatus').className = 'status ok';
     }
   </script>
